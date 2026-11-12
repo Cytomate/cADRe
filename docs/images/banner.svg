@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" role="img" aria-label="cADRe: Agentic Detection and Response for the AI agents on your machine">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1020"/>
+      <stop offset="1" stop-color="#131c36"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.16" cy="0.5" r="0.45">
+      <stop offset="0" stop-color="#5b7cff" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#5b7cff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="300" rx="24" fill="url(#bg)"/>
+  <rect width="1200" height="300" rx="24" fill="url(#glow)"/>
+
+  <!-- radar rings behind the mark -->
+  <g fill="none" stroke="#5b7cff" stroke-opacity="0.14">
+    <circle cx="190" cy="150" r="96"/>
+    <circle cx="190" cy="150" r="128"/>
+    <circle cx="190" cy="150" r="160"/>
+  </g>
+
+  <!-- the cADRe mark (same geometry as cadre/static/icon.svg, scaled 1.6) -->
+  <g transform="translate(110 70) scale(1.6)">
+    <path d="M71.07 32.32 A27.5 27.5 0 1 0 71.07 67.68" fill="none" stroke="#5b7cff" stroke-width="8.75" stroke-linecap="round"/>
+    <circle cx="50" cy="50" r="8.125" fill="#2dd4bf"/>
+    <circle cx="75" cy="41.25" r="4.125" fill="#e6ebf5"/>
+    <circle cx="81.875" cy="50" r="4.125" fill="#e6ebf5"/>
+    <circle cx="75" cy="58.75" r="4.125" fill="#e6ebf5"/>
+  </g>
+
+  <g font-family="'Segoe UI', system-ui, -apple-system, Helvetica, Arial, sans-serif">
+    <text x="330" y="132" font-size="76" font-weight="700" fill="#e6ebf5">c<tspan fill="#7c96ff">ADR</tspan>e</text>
+    <text x="333" y="176" font-size="26" fill="#aab4cf">Agentic Detection &amp; Response for the AI agents on your machine</text>
+
+    <g font-size="17" font-weight="600">
+      <rect x="333" y="204" width="118" height="38" rx="19" fill="#2dd4bf" fill-opacity="0.12" stroke="#2dd4bf" stroke-opacity="0.5"/>
+      <text x="392" y="229" text-anchor="middle" fill="#5eead4">Observe</text>
+      <rect x="465" y="204" width="104" height="38" rx="19" fill="#5b7cff" fill-opacity="0.14" stroke="#5b7cff" stroke-opacity="0.6"/>
+      <text x="517" y="229" text-anchor="middle" fill="#9db0ff">Detect</text>
+      <rect x="583" y="204" width="92" height="38" rx="19" fill="#fbbf24" fill-opacity="0.12" stroke="#fbbf24" stroke-opacity="0.5"/>
+      <text x="629" y="229" text-anchor="middle" fill="#fcd34d">Alert</text>
+      <rect x="689" y="204" width="116" height="38" rx="19" fill="#fb7185" fill-opacity="0.12" stroke="#fb7185" stroke-opacity="0.55"/>
+      <text x="747" y="229" text-anchor="middle" fill="#fda4af">Respond</text>
+    </g>
+    <text x="1166" y="270" font-size="15" text-anchor="end" fill="#6b7694">local · read-only · Python standard library</text>
+  </g>
+</svg>

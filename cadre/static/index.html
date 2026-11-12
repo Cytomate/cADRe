@@ -1,0 +1,1374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cADRe</title>
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<meta name="theme-color" content="#0e1424">
+<script>
+  // theme before first paint: an explicit choice wins, else the system setting (CSS below)
+  try { const t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<style>
+:root{
+  --bg:#F4F6FA;--panel:#FFFFFF;--panel2:#F7F8FB;--line:#DFE4EC;--line2:#EDF0F5;--fg:#121826;--fg2:#3A4458;--mute:#4A5468;
+  --accent:#3B5BDB;--accent-fg:#3B5BDB;--logo-dots:#141A2A;
+  --working:#10B981;--waiting:#F59E0B;--idle:#3B82F6;--suspended:#8B5CF6;--sleeping:#94A3B8;--flag:#E11D48;
+  --working-fg:#047857;--waiting-fg:#92400E;--idle-fg:#1D4ED8;--suspended-fg:#6D28D9;--sleeping-fg:#4A5468;--flag-fg:#9F1239;
+  --working-bg:#D1FAE5;--waiting-bg:#FEF3C7;--idle-bg:#DBEAFE;--suspended-bg:#EDE9FE;--sleeping-bg:#EEF1F5;
+  --flag-bg:#FFF1F2;--flag-line:#FDA4AF;--waiting-panel:#FFFBEB;--waiting-line:#FCD34D;
+  --code:#F1F4F9;--code-fg:#1F2937;
+  --r-disc:#F7F9FC;--r-ring:#DCE3EE;--r-core:#EDF2FB;--r-core-line:#CFD8E6;--r-cross:#E6EBF2;--r-label:#5D6B82;--sweep:rgba(59,91,219,.16);
+  --wall:#E4E9F2;--wall-edge:#D3DAE6;--window:#CFE0F7;--window-frame:#FFFFFF;--door:#A87A52;--knob:#F2C94C;
+  --tile-a:#EEF1F6;--tile-b:#F5F7FA;--rug:rgba(59,91,219,.06);--rug-line:#C9D3E6;--couch-back:#8FA6D6;--couch-seat:#A3B8E2;
+  --cubicle:#E2E8F2;--cubicle-top:#CBD5E3;--monitor:#1E2433;--desk-top:#C9A27A;--desk-front:#A87A52;--desk-leg:#946E48;--desk-name:#FFFFFF;
+  --chair:#C3CCDA;--pad:#C8D4EA;--pot:#A0714F;--leaf1:#3F9B5A;--leaf2:#4CAF68;--cooler:#CFD6DF;--water:rgba(90,160,230,.7);
+  --screen-work:#1F8A5B;--screen-wait:#9A6A10;--screen-off:#3A4252;--tag-bg:#FFFFFF;--tag-line:#D5DCE7;
+  --shadow:rgba(18,24,38,.06);--bot-shadow:rgba(18,24,38,.12);--tip-shadow:rgba(18,24,38,.18);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#0A0E16;--panel:#111827;--panel2:#0E1420;--line:#1E293B;--line2:#1A2335;--fg:#E6EBF5;--fg2:#CBD5E1;--mute:#94A3B8;
+  --accent:#7C93FF;--accent-fg:#9DB0FF;--logo-dots:#E6EBF5;
+  --working:#34D399;--waiting:#FBBF24;--idle:#60A5FA;--suspended:#A78BFA;--sleeping:#64748B;--flag:#FB7185;
+  --working-fg:#34D399;--waiting-fg:#FBBF24;--idle-fg:#60A5FA;--suspended-fg:#C4B5FD;--sleeping-fg:#94A3B8;--flag-fg:#FECDD3;
+  --working-bg:rgba(52,211,153,.12);--waiting-bg:rgba(251,191,36,.12);--idle-bg:rgba(96,165,250,.12);--suspended-bg:rgba(167,139,250,.14);--sleeping-bg:rgba(148,163,184,.1);
+  --flag-bg:#200F15;--flag-line:#5B1E2C;--waiting-panel:#1A160C;--waiting-line:#5C4512;
+  --code:#0A0E16;--code-fg:#D7E0EE;
+  --r-disc:#0B111C;--r-ring:#1E293B;--r-core:#0F1A26;--r-core-line:#24324A;--r-cross:#162033;--r-label:#6B7C98;--sweep:rgba(91,124,255,.28);
+  --wall:#141C2C;--wall-edge:#222D42;--window:#1D2B45;--window-frame:#2A3650;--door:#4A3B2C;--knob:#C9A227;
+  --tile-a:#0F1624;--tile-b:#0D131F;--rug:rgba(91,124,255,.07);--rug-line:#2A3650;--couch-back:#3B4A68;--couch-seat:#475A80;
+  --cubicle:#172133;--cubicle-top:#2A3650;--monitor:#05070C;--desk-top:#6B5137;--desk-front:#5A432D;--desk-leg:#47341F;--desk-name:#F3E6D6;
+  --chair:#2A3650;--pad:#2D3A52;--pot:#6E4E37;--leaf1:#2F7A47;--leaf2:#3A8F55;--cooler:#3A4458;--water:rgba(96,165,250,.55);
+  --screen-work:#14654A;--screen-wait:#6E4D0C;--screen-off:#141A26;--tag-bg:#111827;--tag-line:#24324A;
+  --shadow:rgba(0,0,0,0);--bot-shadow:rgba(0,0,0,.35);--tip-shadow:rgba(0,0,0,.5);
+}}
+:root[data-theme=dark]{
+  --bg:#0A0E16;--panel:#111827;--panel2:#0E1420;--line:#1E293B;--line2:#1A2335;--fg:#E6EBF5;--fg2:#CBD5E1;--mute:#94A3B8;
+  --accent:#7C93FF;--accent-fg:#9DB0FF;--logo-dots:#E6EBF5;
+  --working:#34D399;--waiting:#FBBF24;--idle:#60A5FA;--suspended:#A78BFA;--sleeping:#64748B;--flag:#FB7185;
+  --working-fg:#34D399;--waiting-fg:#FBBF24;--idle-fg:#60A5FA;--suspended-fg:#C4B5FD;--sleeping-fg:#94A3B8;--flag-fg:#FECDD3;
+  --working-bg:rgba(52,211,153,.12);--waiting-bg:rgba(251,191,36,.12);--idle-bg:rgba(96,165,250,.12);--suspended-bg:rgba(167,139,250,.14);--sleeping-bg:rgba(148,163,184,.1);
+  --flag-bg:#200F15;--flag-line:#5B1E2C;--waiting-panel:#1A160C;--waiting-line:#5C4512;
+  --code:#0A0E16;--code-fg:#D7E0EE;
+  --r-disc:#0B111C;--r-ring:#1E293B;--r-core:#0F1A26;--r-core-line:#24324A;--r-cross:#162033;--r-label:#6B7C98;--sweep:rgba(91,124,255,.28);
+  --wall:#141C2C;--wall-edge:#222D42;--window:#1D2B45;--window-frame:#2A3650;--door:#4A3B2C;--knob:#C9A227;
+  --tile-a:#0F1624;--tile-b:#0D131F;--rug:rgba(91,124,255,.07);--rug-line:#2A3650;--couch-back:#3B4A68;--couch-seat:#475A80;
+  --cubicle:#172133;--cubicle-top:#2A3650;--monitor:#05070C;--desk-top:#6B5137;--desk-front:#5A432D;--desk-leg:#47341F;--desk-name:#F3E6D6;
+  --chair:#2A3650;--pad:#2D3A52;--pot:#6E4E37;--leaf1:#2F7A47;--leaf2:#3A8F55;--cooler:#3A4458;--water:rgba(96,165,250,.55);
+  --screen-work:#14654A;--screen-wait:#6E4D0C;--screen-off:#141A26;--tag-bg:#111827;--tag-line:#24324A;
+  --shadow:rgba(0,0,0,0);--bot-shadow:rgba(0,0,0,.35);--tip-shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{color-scheme:light dark}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+code,.mono{font-family:"JetBrains Mono",ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace}
+code{font-size:12px;background:var(--code);color:var(--code-fg);padding:1px 6px;border-radius:5px;overflow-wrap:anywhere}
+h2{margin:0;font-family:"Space Grotesk",Inter,"Segoe UI",sans-serif;font-size:18px;font-weight:600}
+button{font:inherit;color:inherit}
+.mute{color:var(--mute)}
+.page{max-width:1440px;margin:0 auto;padding:20px 28px 48px;display:flex;flex-direction:column;gap:20px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:0 1px 2px var(--shadow);min-width:0}
+.panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:6px 14px;flex-wrap:wrap;margin-bottom:10px}
+.panel-head span{font-size:12px;color:var(--mute)}
+.ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px}
+.brand{display:flex;align-items:center;gap:12px}
+.word{font-family:"Space Grotesk",Inter,"Segoe UI",sans-serif;font-size:24px;font-weight:500;letter-spacing:-.01em;line-height:1}
+.word b{font-weight:700;color:var(--accent-fg)}
+.tagline{font-size:12px;color:var(--mute);margin-top:3px}
+.chipx.limited{background:var(--waiting-panel);border-color:var(--waiting-line);color:var(--waiting-fg);cursor:help}
+.chipx{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--line);background:var(--panel);border-radius:999px;font-size:13px;color:var(--fg2)}
+.grow{flex:1 1 0}
+.live{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--fg2)}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--working);animation:breathe 2s infinite}
+.live.paused i{background:var(--waiting);animation:none}.live.off i{background:var(--flag);animation:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-weight:600;font-size:13px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.icon{width:40px;padding:0}
+.btn svg{stroke:currentColor}
+
+/* totals */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;min-width:0}
+.kpi-label{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.kpi-n{font-family:"Space Grotesk",Inter,sans-serif;font-size:44px;font-weight:600;line-height:1.1}
+.kpi-sub{font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi.needs .kpi-label{color:var(--waiting-fg)}.kpi.working .kpi-label{color:var(--working-fg)}.kpi.idle .kpi-label{color:var(--idle-fg)}
+.kpi.sleeping .kpi-label{color:var(--mute)}.kpi.installed .kpi-label{color:var(--accent-fg)}.kpi.risk .kpi-label{color:var(--flag-fg)}
+.kpi.needs.hot{background:var(--waiting-panel);border-color:var(--waiting-line)}.kpi.needs.hot .kpi-n,.kpi.needs.hot .kpi-sub{color:var(--waiting-fg)}
+.kpi.risk.hot{background:var(--flag-bg);border-color:var(--flag-line)}.kpi.risk.hot .kpi-n,.kpi.risk.hot .kpi-sub{color:var(--flag-fg)}
+
+/* radar + side */
+.hero{display:flex;flex-wrap:wrap;gap:20px;align-items:stretch}
+.radar-panel{flex:1 1 440px;padding-bottom:14px}
+.side{flex:999 1 480px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.radar{position:relative;width:100%;aspect-ratio:1/1;max-width:540px;margin:0 auto}
+.radar svg.rings{position:absolute;inset:0;width:100%;height:100%}
+.sweep{position:absolute;inset:2.5%;border-radius:50%;overflow:hidden;animation:sweep 6s linear infinite;pointer-events:none}
+.sweep::before{content:"";position:absolute;left:50%;top:0;width:50%;height:50%;transform-origin:0 100%;
+  background:conic-gradient(from 0deg at 0 100%,transparent 0deg,var(--sweep) 80deg,transparent 90deg)}
+.blip{position:absolute;display:flex;align-items:center;gap:7px;transform:translate(-7px,-7px);cursor:pointer}
+.blip.left{flex-direction:row-reverse;transform:translate(calc(-100% + 7px),-7px)}
+.blip .dot{position:relative;width:14px;height:14px;flex:none;border-radius:50%;background:var(--c);box-shadow:0 0 0 3px var(--r-disc)}
+.blip.small .dot{width:9px;height:9px}
+.blip.small{transform:translate(-4.5px,-4.5px)}
+.blip.small.left{transform:translate(calc(-100% + 4.5px),-4.5px)}
+.blip.ping .dot::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--c);animation:ping 1.8s ease-out infinite}
+.blip-label{background:var(--tag-bg);border:1px solid var(--tag-line);border-radius:8px;padding:2px 8px;white-space:nowrap;font-size:12px;line-height:1.35;box-shadow:0 1px 2px var(--shadow)}
+.blip-label span{color:var(--mute)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;margin-top:12px;font-size:12px;color:var(--fg2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+
+.needs-banner{background:var(--waiting-panel);border:1px solid var(--waiting-line);border-radius:18px;padding:16px 20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.needs-banner .who{flex:1 1 260px;min-width:0}
+.needs-banner .when{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--waiting-fg)}
+.needs-banner .name{font-family:"Space Grotesk",Inter,sans-serif;font-size:19px;font-weight:600;margin-top:2px}
+.needs-banner .what{margin-top:6px;font-size:13px;color:var(--waiting-fg)}
+.needs-banner .go{height:44px;padding:0 18px;border-radius:10px;border:0;background:var(--waiting);color:#1A1305;font-weight:700;font-size:13px;cursor:pointer}
+.feed{flex:1 1 auto;display:flex;flex-direction:column}
+.feed-scroll{position:relative;flex:1 1 0;min-height:300px;max-height:620px;overflow:auto;margin:0 -6px;padding:0 6px;overscroll-behavior:contain}
+.feed ol,.explorer ol{list-style:none;margin:0;padding:0}
+.feed li,.explorer li{border-top:1px solid var(--line2)}
+.feed-more{padding:12px 0;text-align:center;font-size:12px;color:var(--mute)}
+.linkbtn{background:none;border:0;color:var(--accent-fg);font-weight:600;font-size:12.5px;cursor:pointer;padding:4px 6px;border-radius:6px}
+.linkbtn:hover{text-decoration:underline}
+.new-pill{position:sticky;top:6px;z-index:2;display:block;margin:0 auto -30px;height:28px;padding:0 14px;border-radius:999px;border:0;background:var(--accent);color:#fff;font-weight:600;font-size:12px;cursor:pointer;box-shadow:0 4px 12px var(--tip-shadow)}
+.ev.wide{grid-template-columns:136px 12px minmax(0,220px) minmax(0,1fr)}
+.explorer{width:min(1180px,96vw);height:min(860px,90vh);max-width:none;max-height:none;padding:0;border:1px solid var(--line);border-radius:18px;background:var(--panel);color:var(--fg);box-shadow:0 24px 64px var(--tip-shadow)}
+.explorer[open]{display:flex;flex-direction:column}
+.explorer::backdrop{background:rgba(10,14,22,.55)}
+.ex-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 20px;border-bottom:1px solid var(--line)}
+.ex-head .mute{font-size:13px}
+.ex-filters{display:flex;flex-wrap:wrap;gap:10px 12px;padding:12px 20px;border-bottom:1px solid var(--line)}
+.field{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mute);flex:1 1 160px;min-width:0}
+.field.wide-field{flex:3 1 260px}
+.field input,.field select{height:38px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);padding:0 10px;font:inherit;font-size:13px}
+.field input:focus,.field select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.ex-scroll{flex:1 1 auto;overflow:auto;padding:0 20px;overscroll-behavior:contain}
+.ex-note{margin:0;padding:10px 20px;border-top:1px solid var(--line);font-size:12px;color:var(--mute)}
+body.explorer-only .page{display:none}
+body.explorer-only .explorer{position:fixed;inset:0;width:100%;height:100%;border:0;border-radius:0;margin:0;box-shadow:none}
+body.explorer-only #ex-popout{display:none}
+.ev{display:grid;grid-template-columns:44px 12px minmax(0,170px) minmax(0,1fr);gap:10px;align-items:center;width:calc(100% + 12px);margin:0 -6px;padding:8px 6px;background:none;border:0;border-radius:8px;text-align:left;cursor:copy}
+.ev:hover,.ev:focus-visible{background:var(--panel2);outline:none}
+.ev:focus-visible{box-shadow:0 0 0 2px var(--accent)}
+.copyable{cursor:copy;border-bottom:1px dotted var(--mute)}
+.copyable:hover{border-bottom-color:var(--accent)}
+.pop{position:fixed;z-index:30;width:min(520px,calc(100vw - 24px));background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px var(--tip-shadow);padding:12px 14px;pointer-events:none}
+.pop-head{display:flex;align-items:center;gap:8px;font-size:12.5px;flex-wrap:wrap}
+.pop-head span{color:var(--mute)}
+.pop-kind{margin-top:8px;font-size:12px;font-weight:600}
+.pop-text{margin-top:4px;font-size:12.5px;line-height:1.5;color:var(--code-fg);background:var(--code);border-radius:8px;padding:8px 10px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:240px;overflow:auto}
+.pop-foot{margin-top:8px;font-size:11.5px;color:var(--mute)}
+/* detection (cadre/detect): flagged feed rows and findings */
+.ev.flagged{box-shadow:inset 3px 0 0 var(--flag)}
+.ev .rf{display:inline-flex;vertical-align:-2px;margin-right:5px;color:var(--flag-fg)}
+.pop-finds{margin-top:8px;display:flex;flex-direction:column;gap:4px}
+.pop-find{font-size:12px;color:var(--flag-fg);background:var(--flag-bg);border-radius:6px;padding:4px 8px}
+.pop-find b{font-weight:600}.pop-find .mute{font-size:11px}
+.flag.sev-info{background:var(--sleeping-bg);color:var(--sleeping-fg)}
+.kpi[data-open-explorer]{cursor:pointer}
+/* Live activity tabs: Activity | Alerts (flagged events only) */
+.feed .panel-head h2{margin-right:4px}
+.tabs{display:inline-flex;gap:2px;padding:2px;border-radius:10px;background:var(--panel2);border:1px solid var(--line2);margin-right:auto}
+.tab{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 11px;border:0;border-radius:8px;background:none;color:var(--fg2);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+.tab:hover{color:var(--fg)}
+.tab[aria-selected="true"]{background:var(--panel);color:var(--fg);box-shadow:0 1px 2px var(--shadow)}
+.tab .n{min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--line2);color:var(--fg2);font-size:11px;line-height:18px;text-align:center}
+.tab .n:empty{display:none}
+.tab .n.hot{background:var(--flag);color:#fff}
+.tab#tab-alerts[aria-selected="true"]{color:var(--flag-fg)}
+.ev .k-flag{color:var(--flag-fg)}
+.ev .t{font-size:12px;color:var(--mute);text-align:right}
+.sq{width:10px;height:10px;border-radius:3px;display:inline-block}
+.ev .who{font-size:13px}.ev .who span{color:var(--mute)}
+.ev .what{font-size:12.5px;color:var(--fg2)}
+.ev .what b{font-weight:500;margin-right:6px}
+.k-tool{color:var(--accent-fg)}.k-prompt{color:var(--waiting-fg)}.k-start{color:var(--working-fg)}.k-stop{color:var(--mute)}.k-fail{color:var(--flag-fg)}
+.empty{color:var(--mute);font-size:13px;padding:8px 0}
+
+/* office */
+.office-panel{padding:0;overflow:hidden}
+.office-panel .panel-head{padding:16px 20px 6px;margin:0}
+.wall{height:64px;background:var(--wall);border-top:1px solid var(--line);border-bottom:4px solid var(--wall-edge);display:flex;align-items:center;gap:56px;padding:0 36px;overflow:hidden}
+.window{flex:none;width:110px;height:32px;border-radius:6px;background:var(--window);border:3px solid var(--window-frame)}
+.door{flex:none;position:relative;width:52px;height:60px;margin-top:4px;border-radius:5px 5px 0 0;background:var(--door)}
+.door::after{content:"";position:absolute;right:8px;top:30px;width:6px;height:6px;border-radius:50%;background:var(--knob)}
+.floor{position:relative;isolation:isolate;display:flex;flex-wrap:wrap;min-height:360px;
+  background:repeating-conic-gradient(var(--tile-a) 0 25%,var(--tile-b) 0 50%) 0 0/56px 56px}
+.lounge{flex:1 1 300px;max-width:100%;padding:20px}
+.rug{height:100%;border-radius:18px;background:var(--rug);border:1px dashed var(--rug-line);padding:14px 14px 10px;display:flex;flex-direction:column;gap:6px}
+.zone-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 8px;font-size:12px}
+.zone-head b{font-weight:600;color:var(--fg2);letter-spacing:.05em;text-transform:uppercase}
+.zone-head span{color:var(--mute)}
+.couch{position:relative;padding-top:6px}
+.couch::before{content:"";position:absolute;left:4px;right:4px;top:30px;height:18px;border-radius:8px;background:var(--couch-back)}
+.couch::after{content:"";position:absolute;left:0;right:0;top:44px;height:24px;border-radius:8px;background:var(--couch-seat)}
+.seats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;min-height:96px}
+.seat{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0;border:0;background:transparent;cursor:pointer;min-width:0}
+.seat .sleeper{position:relative;width:44px;height:46px}
+.seat .zz{position:absolute;right:-4px;top:-4px;font:700 12px Inter,sans-serif;color:var(--mute);animation:snooze 2.6s ease-out infinite}
+.seat-name{margin-top:18px;max-width:100%;font-size:11px;line-height:1.3;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seat-name b{font-weight:600}.seat-name span{color:var(--mute)}
+.more-n{align-self:flex-end;font-size:12px;color:var(--mute)}
+.desks{flex:999 1 560px;min-width:0;padding:20px 20px 8px 70px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:100px 22px;align-content:start}
+.desk{display:flex;flex-direction:column;gap:10px;min-width:0}
+.desk-scene{position:relative;height:150px}
+.cubicle{position:absolute;left:18px;right:18px;top:6px;height:60px;border-radius:10px 10px 4px 4px;background:var(--cubicle);border-top:4px solid var(--cubicle-top);z-index:1}
+.monitor{position:absolute;left:50%;margin-left:-84px;bottom:44px;width:50px;height:34px;border-radius:6px;background:var(--monitor);z-index:1}
+.monitor::after{content:"";position:absolute;left:21px;bottom:-6px;width:8px;height:6px;background:var(--monitor)}
+.screen{position:absolute;inset:4px;border-radius:3px;display:flex;flex-direction:column;gap:4px;padding:4px 5px;background:var(--screen-off)}
+.screen i{display:block;height:3px;border-radius:2px;background:rgba(255,255,255,.72)}
+.screen i:nth-child(1){width:70%}.screen i:nth-child(2){width:45%}.screen i:nth-child(3){width:85%}
+.screen.off i{opacity:0}.screen.work{background:var(--screen-work)}.screen.wait{background:var(--screen-wait)}
+.screen.work i:nth-child(odd){animation:type .9s steps(2) infinite}
+.chair{position:absolute;left:50%;margin-left:-6px;bottom:32px;width:34px;height:38px;border-radius:10px 10px 4px 4px;background:var(--chair);z-index:1}
+.desk-top{position:absolute;left:50%;margin-left:-100px;width:200px;bottom:32px;height:12px;border-radius:5px;background:var(--desk-top);z-index:3}
+.desk-front{position:absolute;left:50%;margin-left:-94px;width:188px;bottom:6px;height:26px;background:var(--desk-front);border-radius:0 0 4px 4px;z-index:3;display:flex;align-items:center;justify-content:center}
+.desk-front span{font-weight:600;font-size:12.5px;color:var(--desk-name);max-width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.desk-leg{position:absolute;bottom:0;width:8px;height:6px;background:var(--desk-leg);z-index:3;left:50%}
+.desk-leg.l{margin-left:-88px}.desk-leg.r{margin-left:80px}
+.desk-tags{display:flex;flex-direction:column;gap:6px}
+.tag{display:flex;flex-direction:column;gap:5px;width:100%;text-align:left;background:var(--tag-bg);border:1px solid var(--line);border-radius:12px;padding:9px 11px;cursor:pointer;box-shadow:0 1px 2px var(--shadow);min-width:0}
+.tag:hover{border-color:var(--accent)}
+.tag.st-waiting{border-color:var(--waiting-line)}.tag.flagged{border-color:var(--flag-line)}
+.tag-head{display:flex;align-items:center;gap:8px;min-width:0}
+.tag-head b{font-weight:600;font-size:13px}
+.tag-head .branch{margin-left:auto;flex:none;font-size:11.5px;color:var(--mute);max-width:40%}
+.tag-now{font-size:12px;color:var(--code-fg)}
+.tag-now i{font-style:normal;margin-right:4px}
+.tag-flag{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--flag-fg)}
+.tag-meta{font-size:11.5px;color:var(--mute)}
+.tag.empty-desk{cursor:default;color:var(--mute);font-size:12px;border-style:dashed;box-shadow:none}
+.pill{flex:none;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border-radius:999px;padding:2px 8px}
+.st-working.pill{color:var(--working-fg);background:var(--working-bg)}.st-waiting.pill{color:var(--waiting-fg);background:var(--waiting-bg)}
+.st-idle.pill{color:var(--idle-fg);background:var(--idle-bg)}.st-suspended.pill{color:var(--suspended-fg);background:var(--suspended-bg)}
+.st-sleeping.pill,.st-installed.pill{color:var(--sleeping-fg);background:var(--sleeping-bg)}
+.st-working .tag-now i{color:var(--working)}.st-waiting .tag-now i{color:var(--waiting)}.st-idle .tag-now i{color:var(--idle)}.st-suspended .tag-now i{color:var(--suspended)}
+.bottom-row{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:20px;padding:6px 20px 20px;align-items:flex-end}
+.open-floor{flex:999 1 380px;min-width:0;position:relative;height:130px;border:1px dashed var(--rug-line);border-radius:16px}
+.open-floor .zone-head{position:absolute;left:14px;top:10px}
+.cooler{position:absolute;left:22px;bottom:16px;width:22px;height:30px;border-radius:4px;background:var(--cooler)}
+.cooler::before{content:"";position:absolute;left:2px;bottom:28px;width:18px;height:22px;border-radius:6px;background:var(--water)}
+.plant{position:absolute;right:18px;bottom:12px;width:18px;height:40px}
+.plant i{position:absolute;display:block}
+.plant i:nth-child(1){left:1px;bottom:0;width:16px;height:14px;border-radius:3px;background:var(--pot)}
+.plant i:nth-child(2){left:-4px;bottom:12px;width:14px;height:14px;border-radius:50%;background:var(--leaf1)}
+.plant i:nth-child(3){left:7px;bottom:16px;width:15px;height:15px;border-radius:50%;background:var(--leaf2)}
+.dock{flex:1 1 340px;min-width:0;border-radius:16px;background:var(--panel);border:1px solid var(--line);padding:10px 14px 12px}
+.pads{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin-top:4px}
+.pad{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;cursor:pointer;background:none;border:0;padding:0}
+.pad .spot{position:relative;width:64px;height:60px}
+.pad .spot::before{content:"";position:absolute;left:6px;right:6px;bottom:0;height:12px;border-radius:50%;background:var(--pad);border:2px solid var(--accent);animation:charge 2.4s ease-in-out infinite}
+.pad svg{position:absolute;left:10px;bottom:4px;opacity:.65}
+.pad b{max-width:100%;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pad span{font-size:11px;color:var(--mute)}
+.bots{position:absolute;inset:0;z-index:2;pointer-events:none}
+.bot{position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;will-change:transform}
+.bot svg{display:block;overflow:visible}
+.bot.face-left svg{transform:scaleX(-1)}
+.bot-tag{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:2px;white-space:nowrap;font-size:11.5px;background:var(--tag-bg);border:1px solid var(--tag-line);border-radius:8px;padding:2px 7px;box-shadow:0 1px 2px var(--shadow)}
+.bot-tag span{color:var(--mute)}
+.bot.seated .bot-tag{display:none}
+.bot.aisle .bot-tag{visibility:hidden}
+.bot.typing svg{animation:bob 1.4s ease-in-out infinite}
+.bot .alert{position:absolute;left:36px;top:-12px;width:22px;height:22px;border-radius:50%;background:var(--waiting);color:#1A1305;font:800 14px/22px Inter,sans-serif;text-align:center;display:none}
+.bot .alert::before{content:"";position:absolute;inset:0;border-radius:50%;background:var(--waiting);animation:ping 1.6s ease-out infinite;z-index:-1}
+.bot.waiting .alert{display:block}
+.bot.suspended svg{filter:grayscale(1);opacity:.6}
+.bot .pause{position:absolute;left:50%;top:-14px;transform:translateX(-50%);font:800 12px Inter,sans-serif;color:var(--suspended-fg);display:none}
+.bot.suspended .pause{display:block}
+.shadow{fill:var(--bot-shadow)}
+.bot.flagged .shadow{fill:rgba(251,113,133,.55)}
+.bot.moving .leg-l{animation:stepA .34s ease-in-out infinite alternate}
+.bot.moving .leg-r{animation:stepB .34s ease-in-out infinite alternate}
+.leg-l,.leg-r{transform-box:fill-box}
+.bot.hover svg,.bot.pinned svg{filter:drop-shadow(0 0 4px var(--accent))}
+.cop .bot-tag{font-weight:700;font-size:10.5px;color:var(--accent-fg);border-color:var(--accent)}
+.cop.alert .bot-tag{color:var(--flag-fg);background:var(--flag-bg);border-color:var(--flag-line)}
+.siren-r{animation:sirenA 1.4s steps(1) infinite}.siren-b{animation:sirenB 1.4s steps(1) infinite}
+.cop.alert .siren-r{animation-duration:.5s}.cop.alert .siren-b{animation-duration:.5s}
+.tip{position:absolute;z-index:6;width:min(360px,calc(100% - 16px));background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 32px var(--tip-shadow);padding:14px 16px}
+.card-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-head b{font-size:15px}
+.fam{width:10px;height:10px;border-radius:3px;display:inline-block}
+.hooked{font-size:11px;color:var(--working-fg)}
+.card-sub{font-size:12px;color:var(--mute);margin-top:2px;overflow-wrap:anywhere}
+.kv{display:grid;grid-template-columns:78px minmax(0,1fr);gap:3px 10px;margin:10px 0 0;font-size:12.5px}
+.kv dt{color:var(--mute)}.kv dd{margin:0;overflow-wrap:anywhere}
+.flag{display:inline-flex;align-items:center;gap:6px;background:var(--flag-bg);color:var(--flag-fg);border-radius:8px;padding:3px 8px;font-size:12px;margin:8px 6px 0 0;font-weight:500}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13px;max-width:min(560px,calc(100% - 32px));overflow-wrap:anywhere;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+.toast.show{opacity:1}
+
+/* hook coverage */
+.hk{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.hk-ok{color:var(--working-fg);background:var(--working-bg)}
+.hk-missing,.hk-stale,.hk-outdated{color:var(--waiting-fg);background:var(--waiting-bg)}
+.hk-unreadable{color:var(--flag-fg);background:var(--flag-bg)}
+.hk-unsupported{color:var(--sleeping-fg);background:var(--sleeping-bg)}
+.btn.sm{height:30px;padding:0 12px;font-size:12.5px;border-radius:8px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn[disabled]{opacity:.55;cursor:default}
+/* response (cadre/respond): Pause / Resume / Kill on an agent, the risk banner, the kill dialog */
+.btn.danger{color:var(--flag-fg);border-color:var(--flag-line)}
+.btn.danger:hover{background:var(--flag-bg);border-color:var(--flag)}
+.btn.danger.solid{background:var(--flag);border-color:var(--flag);color:#fff}
+.btn.icon[aria-pressed="true"]{color:var(--accent-fg);border-color:var(--accent)}
+.act-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--line2);font-size:12px}
+.risk-banner{background:var(--flag-bg);border:1px solid var(--flag-line);border-radius:18px;padding:16px 20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.risk-banner .who{flex:1 1 260px;min-width:0}
+.risk-banner .when{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--flag-fg)}
+.risk-banner .name{font-family:"Space Grotesk",Inter,sans-serif;font-size:19px;font-weight:600;margin-top:2px}
+.risk-banner .what{margin-top:6px;font-size:13px;color:var(--flag-fg)}
+.risk-banner .acts{display:flex;gap:8px;flex-wrap:wrap}
+.risk-stack{display:grid;gap:10px}
+.risk-more{font-size:12.5px;padding:0 6px}
+.risk-banner.paused{background:var(--suspended-bg);border-color:var(--suspended)}
+.risk-banner.paused .when,.risk-banner.paused .what{color:var(--suspended-fg)}
+/* what was already done about an alert's agent (Alerts tab) */
+.taken{flex:none;font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.taken-kill{color:var(--sleeping-fg);background:var(--sleeping-bg)}
+.taken-pause{color:var(--suspended-fg);background:var(--suspended-bg)}
+.has-fp.is-killed .ev{opacity:.6}
+.confirm-dlg{width:min(460px,92vw);padding:22px 24px 18px;border:1px solid var(--line);border-radius:18px;background:var(--panel);color:var(--fg);box-shadow:0 24px 64px var(--tip-shadow)}
+.confirm-dlg::backdrop{background:rgba(10,14,22,.55)}
+.confirm-dlg h2{margin:0;font-size:18px}
+.confirm-dlg p{margin:10px 0 0;font-size:13.5px;line-height:1.55;color:var(--fg2)}
+.confirm-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+/* false positives (a button on alert rows, the banner and flag chips) and the Responses tab */
+.feed li.has-fp{display:flex;align-items:center;gap:8px}
+.has-fp .ev{flex:1 1 0;min-width:0;width:auto;margin-right:0}
+.fp-btn{flex:none;height:26px;padding:0 9px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--fg2);font:inherit;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.fp-btn:hover{border-color:var(--accent);color:var(--fg)}
+.flag .fp-x{margin:0 -3px 0 2px;width:18px;height:18px;padding:0;border:0;border-radius:5px;background:none;color:inherit;font-size:11px;line-height:18px;cursor:pointer;opacity:.7}
+.flag .fp-x:hover{opacity:1;background:var(--flag-line)}
+.fp-note{margin-top:8px;font-size:12px}
+.resp{display:grid;grid-template-columns:44px 96px minmax(0,150px) minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;font-size:12.5px}
+.resp .t{font-size:12px;color:var(--mute);text-align:right}
+.resp .who span{color:var(--mute)}
+.resp .what{color:var(--fg2)}
+.resp.failed .what{color:var(--flag-fg)}
+.ra{font-weight:600;font-size:12px}
+.ra-pause{color:var(--suspended-fg)}.ra-resume{color:var(--working-fg)}.ra-kill{color:var(--flag-fg)}.ra-dismiss,.ra-restore{color:var(--accent-fg)}
+.pop-find.gone{background:var(--sleeping-bg);color:var(--sleeping-fg)}
+.hook-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:12.5px}
+.hook-row .mute{font-size:12px}
+.count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--waiting);color:#1A1305;font-size:11.5px;font-weight:700}
+.hooks-dlg{width:min(980px,96vw);max-height:min(820px,90vh);padding:0;border:1px solid var(--line);border-radius:18px;background:var(--panel);color:var(--fg);box-shadow:0 24px 64px var(--tip-shadow)}
+.hooks-dlg[open]{display:flex;flex-direction:column}
+.hooks-dlg::backdrop{background:rgba(10,14,22,.55)}
+.hooks-body{overflow:auto;padding:4px 20px 16px}
+.hooks-intro{margin:12px 0 4px;font-size:13px;color:var(--fg2);max-width:76ch}
+.hooks-results{margin:12px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-size:13px}
+.hooks-results ul{margin:6px 0 0;padding-left:18px}
+.hooks-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 20px;border-top:1px solid var(--line)}
+.hooks-foot .mute{font-size:12px}
+
+/* tables */
+details.more summary{cursor:pointer;font-family:"Space Grotesk",Inter,sans-serif;font-size:16px;font-weight:600}
+.tablewrap{overflow-x:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:8px 10px;border-top:1px solid var(--line2);vertical-align:top}
+th{color:var(--mute);font-weight:600;font-size:12px;border-top:0}
+.path{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace;font-size:12px;color:var(--mute);overflow-wrap:anywhere}
+
+@keyframes breathe{50%{opacity:.4}}
+@keyframes sweep{to{transform:rotate(360deg)}}
+@keyframes ping{0%{transform:scale(1);opacity:.7}100%{transform:scale(3);opacity:0}}
+@keyframes bob{50%{transform:translateY(-3px)}}
+@keyframes type{50%{opacity:.35}}
+@keyframes snooze{0%{transform:translate(0,0);opacity:0}30%{opacity:1}100%{transform:translate(10px,-18px);opacity:0}}
+@keyframes charge{50%{opacity:.35}}
+@keyframes stepA{from{transform:translateY(0)}to{transform:translateY(-4px)}}
+@keyframes stepB{from{transform:translateY(-4px)}to{transform:translateY(0)}}
+@keyframes sirenA{0%,49%{opacity:1}50%,100%{opacity:.25}}
+@keyframes sirenB{0%,49%{opacity:.25}50%,100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+@media (max-width:640px){.ev.wide{grid-template-columns:62px 10px minmax(0,1fr)}.feed-scroll{flex:none;max-height:460px}.desks{padding-left:20px}.page{padding:16px 16px 40px}.ev{grid-template-columns:36px 10px minmax(0,1fr)}.ev .what{grid-column:3}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <div class="brand">
+      <svg width="40" height="40" viewBox="0 0 64 64" role="img" aria-label="cADRe logo">
+        <path d="M48.85 17.86 A22 22 0 1 0 48.85 46.14" fill="none" stroke="#5B7CFF" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="32" cy="32" r="6.5" fill="#2DD4BF"/>
+        <circle cx="52" cy="25" r="3.3" style="fill:var(--logo-dots)"/>
+        <circle cx="57.5" cy="32" r="3.3" style="fill:var(--logo-dots)"/>
+        <circle cx="52" cy="39" r="3.3" style="fill:var(--logo-dots)"/>
+      </svg>
+      <div><div class="word">c<b>ADR</b>e</div><div class="tagline">Agentic Detection &amp; Response</div></div>
+    </div>
+    <span class="chipx" id="host">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+      <span>…</span>
+    </span>
+    <span class="chipx limited" id="limited" tabindex="0" hidden>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+      <span>Limited view: no psutil</span>
+    </span>
+    <span class="grow"></span>
+    <span class="live" id="live"><i></i><span>connecting…</span></span>
+    <button type="button" class="btn icon" id="notify" aria-label="Desktop notifications for risk flags" aria-pressed="false" hidden></button>
+    <button type="button" class="btn icon" id="theme" aria-label="Switch theme"></button>
+    <button type="button" class="btn" id="hooks-btn" hidden></button>
+    <button type="button" class="btn" id="pause" hidden></button>
+  </header>
+
+  <section class="kpis" id="kpis" aria-label="Totals"></section>
+
+  <div class="hero">
+    <section class="panel radar-panel" aria-label="Radar">
+      <div class="panel-head"><h2>Radar</h2><span>closer to the centre = more active</span></div>
+      <div class="radar" id="radar">
+        <svg class="rings" viewBox="0 0 400 400" aria-hidden="true">
+          <circle cx="200" cy="200" r="190" style="fill:var(--r-disc);stroke:var(--r-ring)"/>
+          <circle cx="200" cy="200" r="132" style="fill:none;stroke:var(--r-ring)"/>
+          <circle cx="200" cy="200" r="72" style="fill:var(--r-core);stroke:var(--r-core-line)"/>
+          <path d="M200 10 V390 M10 200 H390" style="stroke:var(--r-cross)"/>
+          <g style="fill:var(--r-label)" font-size="10" text-anchor="middle" font-family="Inter,Segoe UI,sans-serif" letter-spacing="1.5">
+            <text x="200" y="138">WORKING</text><text x="200" y="78">WAITING · IDLE</text><text x="200" y="24">SLEEPING</text>
+          </g>
+          <circle cx="200" cy="200" r="5" fill="#2DD4BF"/>
+        </svg>
+        <div class="sweep"></div>
+        <div id="blips"></div>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--working)"></i>working</span><span><i style="background:var(--waiting)"></i>needs you</span>
+        <span><i style="background:var(--idle)"></i>idle</span><span><i style="background:var(--suspended)"></i>suspended</span>
+        <span><i style="background:var(--sleeping)"></i>sleeping</span><span><i style="background:var(--flag)"></i>risk flag</span>
+      </div>
+    </section>
+    <div class="side">
+      <section class="risk-stack" id="risk" aria-label="Agents that need a decision" hidden></section>
+      <section class="needs-banner" id="needs" aria-label="Needs you" hidden></section>
+      <section class="panel feed" aria-label="Live activity">
+        <div class="panel-head"><h2>Live activity</h2>
+          <div class="tabs" role="tablist" aria-label="Show">
+            <button type="button" class="tab" role="tab" id="tab-all" data-tab="all" aria-selected="true" aria-controls="feed-scroll">Activity</button>
+            <button type="button" class="tab" role="tab" id="tab-alerts" data-tab="alerts" aria-selected="false" aria-controls="feed-scroll"
+              title="Events a detection rule flagged">Alerts <span class="n" id="alerts-n"></span></button>
+            <button type="button" class="tab" role="tab" id="tab-responses" data-tab="responses" aria-selected="false" aria-controls="feed-scroll"
+              title="What was done about agents and alerts: pause, resume, kill, false positives">Responses <span class="n" id="responses-n"></span></button>
+          </div>
+          <span id="feed-meta"></span>
+          <button type="button" class="linkbtn" id="feed-explorer" data-open-explorer data-kind="">Open explorer</button></div>
+        <div class="feed-scroll" id="feed-scroll" role="tabpanel">
+          <button type="button" class="new-pill" id="feed-new" hidden></button>
+          <ol id="events"></ol>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <section class="panel office-panel" aria-label="The office">
+    <div class="panel-head"><h2>The office</h2>
+      <span>at a desk = working · hand up = needs you · roaming = idle · couch = sleeping · charging = installed · police droid = cADRe on patrol, stops at a risky agent</span>
+    </div>
+    <div class="wall" aria-hidden="true"><i class="window"></i><i class="window"></i><i class="door" id="door"></i><i class="window"></i><i class="window"></i><i class="window"></i><i class="window"></i><i class="window"></i></div>
+    <div class="floor" id="floor">
+      <div class="lounge"><div class="rug" id="lounge"></div></div>
+      <div class="desks" id="desks"></div>
+      <div class="bottom-row">
+        <div class="open-floor" id="openfloor" aria-hidden="true"><div class="zone-head"><b>Open floor</b></div><i class="cooler"></i><span class="plant"><i></i><i></i><i></i></span></div>
+        <div class="dock" id="dock"></div>
+      </div>
+      <div class="bots" id="bots"></div>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+  </section>
+
+  <details class="panel more">
+    <summary>Projects and installed tools</summary>
+    <div class="tablewrap"><table id="projects"></table></div>
+    <div class="tablewrap"><table id="installed"></table></div>
+  </details>
+</div>
+<dialog class="confirm-dlg" id="confirm-dlg" aria-labelledby="cf-title" aria-describedby="cf-text">
+  <h2 id="cf-title"></h2>
+  <p id="cf-text"></p>
+  <div class="confirm-foot">
+    <button type="button" class="btn" id="cf-no">Cancel</button>
+    <button type="button" class="btn danger solid" id="cf-yes">Kill agent</button>
+  </div>
+</dialog>
+<dialog class="explorer" id="explorer" aria-labelledby="ex-title">
+  <div class="ex-head">
+    <h2 id="ex-title">Event explorer</h2><span class="mute" id="ex-count"></span>
+    <span class="grow"></span>
+    <button type="button" class="btn" id="ex-popout">Open in new window</button>
+    <button type="button" class="btn icon" id="ex-close" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="ex-filters">
+    <label class="field wide-field"><span>Search</span><input type="search" id="ex-q" placeholder="a command, file path or words from a prompt" autocomplete="off"></label>
+    <label class="field"><span>Agent</span><select id="ex-agent"><option value="">All agents</option></select></label>
+    <label class="field"><span>Kind</span><select id="ex-kind">
+      <option value="">Everything</option><option value="tool">Tool calls</option><option value="prompt">Your prompts</option>
+      <option value="waiting">Waiting for you</option><option value="session">Sessions (start, done, end)</option><option value="failed">Failed tool calls</option><option value="flagged">Flagged by a rule</option></select></label>
+    <label class="field"><span>Project</span><select id="ex-project"><option value="">All projects</option></select></label>
+  </div>
+  <div class="ex-scroll" id="ex-scroll"><ol id="ex-list"></ol></div>
+  <p class="ex-note">Hover a row for all of it, click to copy. Hooks keep the first 200 characters of a prompt.</p>
+</dialog>
+<dialog class="hooks-dlg" id="hooks-dlg" aria-labelledby="hk-title">
+  <div class="ex-head">
+    <h2 id="hk-title">Hooks</h2><span class="mute" id="hk-sub"></span>
+    <span class="grow"></span>
+    <button type="button" class="btn icon" id="hk-close" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="hooks-body">
+    <p class="hooks-intro">Hooks stream each agent's prompts, tool calls and "waiting for you" into the live feed. cADRe adds one watch-only hook per event to the agent's config file. Your own hooks and settings stay as they are, and each file is backed up to <code>.cadre-bak</code> before it changes.</p>
+    <div id="hk-results"></div>
+    <div class="tablewrap"><table id="hk-table"></table></div>
+  </div>
+  <div class="hooks-foot">
+    <button type="button" class="btn" id="hk-scan">Recalibrate</button>
+    <button type="button" class="btn primary" id="hk-all"></button>
+    <span class="mute" id="hk-when"></span>
+  </div>
+</dialog>
+<div class="pop" id="pop" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const short = (s, n) => (s = String(s ?? "").replace(/\s+/g, " ").trim()).length > n ? s.slice(0, n - 1) + "…" : s;
+const ago = t => { if (!t) return "—"; let s = Math.max(0, Math.floor(Date.now() / 1000 - t));
+  for (const [u, n] of [["d", 86400], ["h", 3600], ["m", 60]]) if (s >= n) return Math.floor(s / n) + u + " ago"; return s + "s ago"; };
+const agoShort = t => ago(t).replace(" ago", "");
+const dur = s => s == null ? "—" : s >= 86400 ? Math.floor(s / 86400) + "d " + Math.floor(s % 86400 / 3600) + "h" : s >= 3600 ? Math.floor(s / 3600) + "h " + Math.floor(s % 3600 / 60) + "m" : Math.floor(s / 60) + "m";
+const hash = s => { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
+
+// one fixed colour per model family so "which agent is that?" is answerable at a glance
+const FAMILY = {
+  claude: "#D97757", glm: "#3B6CF6", openai: "#10A37F", gemini: "#8E6CF0", copilot: "#8B949E",
+  cursor: "#5C6370", windsurf: "#14B8A6", qwen: "#A855F7", kimi: "#EC4899", deepseek: "#0EA5E9",
+  local: "#9CA3AF", other: "#B08968",
+};
+const famColor = f => FAMILY[f] || FAMILY.other;
+const SHORT = {"OpenAI Codex CLI": "Codex", "GitHub Copilot CLI": "Copilot", "Gemini CLI": "Gemini", "Claude Desktop": "Claude Desktop"};
+const nameOf = a => SHORT[a.display_name || a.agent] || a.display_name || a.agent;
+const LABEL = {waiting: "needs you"};
+const statusLabel = st => LABEL[st] || st;
+function shade(hex, f) {             // f<0 darker, f>0 lighter
+  const n = parseInt(hex.slice(1), 16);
+  return "#" + [n >> 16, (n >> 8) & 255, n & 255].map(c => Math.round(f < 0 ? c * (1 + f) : c + (255 - c) * f))
+    .map(c => c.toString(16).padStart(2, "0")).join("");
+}
+const WARN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.01"/></svg>';
+
+// ---------------------------------------------------------------- robots (shared with office.js)
+const EYE = {working: "#34D399", waiting: "#FBBF24", idle: "#60A5FA", suspended: "#A78BFA", sleeping: "#94A3B8", installed: "#94A3B8"};
+// pose: desk (legs hidden by the desk) | walk | sleep (on the couch) | dock (charging) | head (avatar)
+function botSVG(a, pose, w, h) {
+  const c = famColor(a.family), body = shade(c, -0.25), eye = EYE[a.status] || EYE.sleeping, fam = a.family;
+  const antennas = fam === "gemini" ? [28, 44] : [36];
+  const armUp = a.status === "waiting" && (pose === "desk" || pose === "walk" || pose === "head");
+  const eyes = pose === "sleep" ? `<path d="M25 28h8M39 28h8" stroke="#64748B" stroke-width="2.5" stroke-linecap="round"/>`
+    : pose === "dock" ? `<path d="M38 22 L31 29 H37 L34 35" stroke="#FBBF24" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`
+    : `<circle cx="29" cy="28" r="3" fill="${eye}"/><circle cx="43" cy="28" r="3" fill="${eye}"/>`;
+  return `<svg viewBox="${pose === "head" ? "6 0 60 50" : "0 0 72 84"}" width="${w || 60}" height="${h || 70}" aria-hidden="true">
+    ${pose === "head" ? "" : '<ellipse class="shadow" cx="36" cy="80" rx="22" ry="4"/>'}
+    ${antennas.map(x => `<line x1="${x}" y1="4" x2="${x}" y2="12" stroke="${c}" stroke-width="3" stroke-linecap="round"/><circle cx="${x}" cy="4" r="3.5" fill="${eye}"/>`).join("")}
+    <rect x="8" y="51" width="9" height="18" rx="4.5" fill="${c}"/>
+    ${armUp ? `<rect x="56" y="18" width="9" height="30" rx="4.5" fill="${c}"/>` : `<rect x="55" y="51" width="9" height="18" rx="4.5" fill="${c}"/>`}
+    ${pose === "walk" ? `<rect class="leg-l" x="24" y="70" width="8" height="12" rx="3" fill="${body}"/><rect class="leg-r" x="40" y="70" width="8" height="12" rx="3" fill="${body}"/>` : ""}
+    <rect x="20" y="48" width="32" height="26" rx="9" fill="${body}"/>
+    <rect x="27" y="56" width="18" height="4" rx="2" fill="#fff" opacity=".5"/>
+    ${fam === "glm" ? `<rect x="9" y="22" width="6" height="12" rx="2" fill="${body}"/><rect x="57" y="22" width="6" height="12" rx="2" fill="${body}"/>` : ""}
+    <rect x="14" y="12" width="44" height="34" rx="${fam === "claude" ? 16 : fam === "glm" ? 5 : 12}" fill="${c}"/>
+    <rect x="${fam === "openai" ? 17 : 20}" y="20" width="${fam === "openai" ? 38 : 32}" height="16" rx="8" fill="#0A0E16"/>
+    ${eyes}</svg>`;
+}
+// cADRe itself: a dome droid in a police cap with a siren
+function copSVG() {
+  return `<svg viewBox="0 0 72 96" width="56" height="74" aria-hidden="true">
+    <ellipse class="shadow" cx="36" cy="92" rx="22" ry="3"/>
+    <rect x="16" y="76" width="14" height="13" rx="4" fill="#121A3A"/><rect x="42" y="76" width="14" height="13" rx="4" fill="#121A3A"/>
+    <rect x="5" y="48" width="10" height="22" rx="5" fill="#2B3F9E"/><rect x="57" y="48" width="10" height="22" rx="5" fill="#2B3F9E"/>
+    <rect x="14" y="44" width="44" height="34" rx="7" fill="#3B5BDB"/><rect x="22" y="50" width="28" height="15" rx="3" fill="#1E2A5A"/>
+    <path d="M36 52 L41 54 V58 C41 61 39 63 36 64 C33 63 31 61 31 58 V54 Z" fill="#F2C94C"/>
+    <circle cx="27" cy="71" r="1.8" fill="#2DD4BF"/><circle cx="36" cy="71" r="1.8" fill="#60A5FA"/><circle cx="45" cy="71" r="1.8" fill="#2DD4BF"/>
+    <rect x="12" y="39" width="48" height="6" rx="2" fill="#C9D4FF"/>
+    <path d="M12 40 A24 24 0 0 1 60 40 Z" fill="#5B7CFF"/>
+    <circle cx="28" cy="33" r="4.5" fill="#fff"/><circle cx="44" cy="33" r="4.5" fill="#fff"/>
+    <circle cx="28.6" cy="33.4" r="2.2" fill="#0A0E16"/><circle cx="44.6" cy="33.4" r="2.2" fill="#0A0E16"/>
+    <path d="M15 26 Q36 4 57 26 Z" fill="#121A3A"/><rect x="12" y="24" width="48" height="5" rx="2.5" fill="#0B1128"/>
+    <circle cx="36" cy="19" r="3" fill="#F2C94C"/>
+    <rect class="siren-r" x="28" y="8" width="8" height="7" rx="2" fill="#EF4444"/><rect class="siren-b" x="36" y="8" width="8" height="7" rx="2" fill="#3B82F6"/>
+  </svg>`;
+}
+
+// click-to-copy: any element with data-copy (agent cards, banner); the feed has its own rows
+const copyable = s => `<span class="copyable" data-copy="${esc(s)}" title="Click to copy">${esc(s)}</span>`;
+function copyText(text, what) {
+  const done = () => toast(`Copied ${what || ""}: ${short(text, 80)}`.replace("Copied :", "Copied:"));
+  const fallback = () => {           // http on a non-loopback name has no async clipboard
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+    ta.remove();
+    ok ? done() : toast("Couldn't copy. Select the text instead.");
+  };
+  navigator.clipboard && window.isSecureContext ? navigator.clipboard.writeText(text).then(done, fallback) : fallback();
+}
+document.addEventListener("click", e => {
+  const c = e.target.closest("[data-copy]");
+  if (c) { e.preventDefault(); copyText(c.dataset.copy); }
+});
+
+function agentCard(a) {
+  const rows = [
+    ["Waiting", a.waiting_for ? `<b style="color:var(--waiting-fg)">${copyable(a.waiting_for)}</b>` : ""],
+    ["Session", esc(a.title)], ["Prompt", a.last_prompt ? copyable(a.last_prompt) : ""],
+    ["Last tool", a.last_tool ? `<code>${copyable(a.last_tool)}</code>` : ""],
+    ["Running", (a.running_children || []).map(x => `<code>${esc(x)}</code>`).join(" ")],
+    ["Branch", esc(a.git_branch)], ["Model", esc(a.model_label || a.model)],
+    ["Folder", a.cwd ? `<code>${copyable(a.cwd)}</code>` : ""],
+    ["Config", a.config_dir && !/[\\/]\.claude$/.test(a.config_dir) ? `<code>${esc(a.config_dir)}</code>` : ""],
+    ["Endpoint", a.endpoint && !/api\.anthropic\.com/.test(a.endpoint) ? `<code>${esc(a.endpoint)}</code>` : ""],
+    ["Process", a.pid ? `pid ${a.pid} · ${a.cpu}% CPU · ${a.rss_mb} MB · up ${dur(a.uptime_s)}` : ""],
+    ["Seen", a.last_activity ? ago(a.last_activity) + (a.tool_calls ? ` · ${a.tool_calls} recent tool calls` : "") : ""],
+    ["Resume", a.resume_cmd ? `<code>${copyable(a.resume_cmd)}</code>` : ""],
+  ].filter(r => r[1]);
+  return `<div class="card-head"><span class="fam" style="background:${famColor(a.family)}"></span><b>${esc(a.display_name || a.agent)}</b>
+      <span class="pill st-${esc(a.status)}">${esc(statusLabel(a.status))}</span>${a.hooked ? '<span class="hooked">● live via hooks</span>' : ""}</div>
+    <div class="card-sub">${esc(a.project || "")}${a.launched_by ? " · via " + esc(a.launched_by) : ""}</div>
+    <dl class="kv">${rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
+    ${hookRow(a.hooks)}
+    ${(a.flags || []).map((f, i) => { const fd = (a.findings || [])[i] || {};
+      return `<span class="flag sev-${esc(fd.severity || "warn")}">${WARN}${esc(f)}${fd.rule ? `<button type="button" class="fp-x" data-dismiss="${esc(JSON.stringify(fpOf(a, fd)))}" title="False positive: take this flag off" aria-label="Mark as a false positive: ${esc(f)}">✕</button>` : ""}</span>`; }).join("")}
+    ${(a.dismissed || []).length ? `<div class="mute fp-note">${a.dismissed.length} flag${a.dismissed.length === 1 ? "" : "s"} marked as a false positive (undo in the Responses tab).</div>` : ""}
+    ${actRow(a)}`;
+}
+// what a "false positive" request says about one finding of an agent record
+const fpOf = (a, f) => ({who: a.session_id || a.id, rule: f.rule, detail: f.detail || "", agent: nameOf(a), project: a.project || ""});
+
+// ---------------------------------------------------------------- response (cadre/respond)
+// Pause / Resume / Kill act on the agent's process and its children, only when clicked.
+const actBtn = (a, act, label, cls = "") => `<button type="button" class="btn sm${cls}" data-respond="${act}" data-id="${esc(a.id)}">${label}</button>`;
+const actBtns = a => !a.pid ? "" : (a.status === "suspended" ? actBtn(a, "resume", "Resume agent") : actBtn(a, "pause", "Pause agent")) + actBtn(a, "kill", "Kill agent", " danger");
+function actRow(a) {
+  return a.pid ? `<div class="act-row">${actBtns(a)}${a.paused_by_cadre ? '<span class="mute">paused by cADRe</span>' : a.needs_fg ? '<span class="mute" title="Resume let it run again, but its terminal still has the shell in front. Type fg there to give the agent its keyboard back.">resumed: type <code>fg</code> in its terminal</span>' : ""}</div>` : "";
+}
+function confirmKill(a, who) {
+  const d = $("confirm-dlg"), n = a.child_count || 0;
+  $("cf-title").textContent = `Kill ${who}?`;
+  $("cf-text").textContent = `This ends pid ${a.pid}${n ? ` and its ${n} child process${n === 1 ? "" : "es"}` : ""} now. Whatever it is doing stops half-way. Its session stays on disk and can usually be resumed.`;
+  d.returnValue = "";
+  d.showModal();
+  $("cf-no").focus();
+  return new Promise(done => d.addEventListener("close", () => done(d.returnValue === "yes"), {once: true}));
+}
+$("cf-no").addEventListener("click", () => $("confirm-dlg").close(""));
+$("cf-yes").addEventListener("click", () => $("confirm-dlg").close("yes"));
+async function respondTo(id, action, btn) {
+  const a = lastSnap && (lastSnap.agents || []).find(x => x.id === id);
+  if (!a) return toast("That agent is gone.");
+  const who = `${nameOf(a)}${a.project ? " in " + a.project : ""}`;
+  if (action === "kill" && !(await confirmKill(a, who))) return;
+  if (btn) btn.disabled = true;
+  try {
+    const r = await fetch("/api/respond", {method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({id, action, confirm: action === "kill"})});
+    const out = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(out.error || r.status);
+    toast(out.ok ? `${who}: ${out.result}.` : `Couldn't ${action} ${who}: ${out.result}.`);
+  } catch (e) { toast(`Couldn't ${action} ${who}: ${e.message}`); }
+  tick();
+}
+// False positive: the finding leaves the agent's flags and the Alerts tab; the server keeps
+// the mark (cadre/respond/dismiss.py) and logs it, and the Responses tab can take it back.
+async function markFP(list, restore) {
+  let done = 0, last = null;
+  for (const d of list) {
+    try {
+      const r = await fetch("/api/respond", {method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(Object.assign({action: restore ? "restore" : "dismiss"}, d))});
+      last = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(last.error || r.status);
+      if (last.ok) done++;
+    } catch (e) { toast(`Couldn't ${restore ? "restore the flag" : "mark it as a false positive"}: ${e.message}`); break; }
+  }
+  if (last && last.result) toast(!done ? `Nothing changed: ${last.result}.`
+    : restore ? "Flag restored." : `Marked as a false positive${done > 1 ? ` (${done} flags)` : ""}. Undo it in the Responses tab.`);
+  resetFeed();
+  tick();
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-respond]");
+  if (b) { e.preventDefault(); e.stopPropagation(); respondTo(b.dataset.id, b.dataset.respond, b); return; }
+  const d = e.target.closest("[data-dismiss], [data-restore]");
+  if (d) { e.preventDefault(); e.stopPropagation(); d.disabled = true; markFP([JSON.parse(d.dataset.dismiss || d.dataset.restore)], !d.dataset.dismiss); return; }
+  const de = e.target.closest("[data-dismiss-ev]"), it = de && ITEMS.get(de.dataset.dismissEv);
+  if (de) {
+    e.preventDefault(); e.stopPropagation(); de.disabled = true;
+    if (it) markFP((it.e.findings || []).map(f => ({who: it.e.session_id, rule: f.rule, detail: f.detail || "", agent: it.name, project: it.proj})));
+    return;
+  }
+  const f = e.target.closest("[data-office-focus]");
+  if (f && window.officeFocus) window.officeFocus(f.dataset.officeFocus);
+}, true);
+
+// ---------------------------------------------------------------- hooks
+const HOOK_LABEL = {ok: "hooked", missing: "no hooks", stale: "stale hook", outdated: "hook outdated",
+  unreadable: "config unreadable", unsupported: "no hook system"};
+const HOOK_ACTION = {missing: "Install hook", stale: "Repair hook", outdated: "Update hook"};
+const hookPill = h => `<span class="hk hk-${esc(h.state)}" title="${esc(h.detail || "")}">${esc(HOOK_LABEL[h.state] || h.state)}</span>`;
+const hookBtn = (paths, label) => `<button type="button" class="btn sm" data-hook-install="${esc(JSON.stringify(paths))}">${esc(label)}</button>`;
+function hookRow(h) {
+  if (!h) return "";
+  if (h.state === "ok") return h.hint ? `<div class="hook-row">${hookPill(h)}<span class="mute">${esc(h.hint)}</span></div>` : "";
+  return `<div class="hook-row">${hookPill(h)}<span class="mute">${esc(h.state === "unreadable" ? h.display + ": " + h.detail : "no live events from this agent")}</span>
+    ${HOOK_ACTION[h.state] ? hookBtn([h.path], HOOK_ACTION[h.state]) : ""}</div>`;
+}
+async function installHooks(body, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = "Installing…"; }
+  try {
+    const r = await fetch("/api/hooks", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+    if (!r.ok) throw new Error(r.status);
+    const out = await r.json();
+    const done = out.results.filter(x => !/^(skipped|up to date)/.test(x.result));
+    const bad = out.results.filter(x => /^skipped/.test(x.result));
+    toast(done.length ? `Hooks installed in ${done.map(x => x.name).join(", ")}.${out.notes.length ? " " + out.notes[0] : ""}`
+      : bad.length ? `Skipped ${bad[0].path}: ${bad[0].result.replace(/^skipped: /, "")}`
+      : out.notes[0] || "Nothing needed installing.");
+    hooks.results = out;
+    if ($("hooks-dlg").open) await hooks.scan(true);
+  } catch (e) { toast("Couldn't install hooks: " + e.message); }
+  tick();
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-hook-install]");
+  if (b) { e.preventDefault(); e.stopPropagation(); installHooks({paths: JSON.parse(b.dataset.hookInstall)}, b); }
+}, true);
+
+const hooks = {
+  data: null, results: null, at: 0,
+  async scan(quiet) {
+    const b = $("hk-scan");
+    b.disabled = true; b.textContent = "Scanning…";
+    try {
+      const r = await fetch("/api/hooks", {cache: "no-store"});
+      if (!r.ok) throw new Error(r.status);
+      this.data = await r.json(); this.at = Date.now();
+      if (!quiet) { this.results = null; toast(`Scanned ${this.data.targets.length} hook file${this.data.targets.length === 1 ? "" : "s"}: ${this.data.pending ? this.data.pending + " need hooks" : "all hooked"}.`); }
+    } catch (e) { toast("Couldn't scan: " + e.message); }
+    b.disabled = false; b.textContent = "Recalibrate";
+    this.draw();
+  },
+  draw() {
+    const d = this.data || (lastSnap && lastSnap.hooks);
+    if (!d) return;
+    const pending = d.targets.filter(t => HOOK_ACTION[t.state]);
+    $("hk-sub").textContent = `${d.targets.length} config file${d.targets.length === 1 ? "" : "s"} · ${pending.length ? pending.length + " pending" : "all hooked"}`;
+    $("hk-table").innerHTML = "<tr><th>Agent</th><th>Hook file</th><th>State</th><th>Found by</th><th></th></tr>" +
+      d.targets.map(t => `<tr><td><b>${esc(t.name)}</b></td><td class="path">${esc(t.display)}</td>
+        <td>${hookPill(t)}<div class="mute" style="font-size:12px;margin-top:4px">${esc(t.detail)}</div></td>
+        <td class="path">${t.why.map(esc).join("<br>")}</td>
+        <td>${HOOK_ACTION[t.state] ? hookBtn([t.path], HOOK_ACTION[t.state].replace(" hook", "")) : ""}</td></tr>`).join("") +
+      (d.targets.length ? "" : `<tr><td colspan="5" class="mute">No hook-capable agents found on this machine.</td></tr>`) +
+      d.unsupported.filter(u => (lastSnap && lastSnap.installed || []).some(i => i.agent_key === u.agent))
+        .map(u => `<tr><td><b>${esc(u.name)}</b></td><td class="path">—</td><td>${hookPill({state: "unsupported"})}</td><td class="mute" colspan="2">${esc(u.reason)}</td></tr>`).join("");
+    const all = $("hk-all");
+    all.textContent = pending.length ? `Install all pending (${pending.length})` : "Nothing pending";
+    all.disabled = !pending.length;
+    $("hk-when").textContent = this.at ? "scanned " + new Date(this.at).toLocaleTimeString() : `hooks run ${d.emit}`;
+    const res = this.results;
+    $("hk-results").innerHTML = res && res.results.length ? `<div class="hooks-results"><b>Last install</b><ul>${res.results.map(x =>
+      `<li>${esc(x.name)} <span class="path">${esc(x.path)}</span>: ${esc(x.result)}</li>`).join("")}</ul>${res.notes.map(n => `<p class="mute" style="margin:8px 0 0">${esc(n)}</p>`).join("")}</div>` : "";
+  },
+  open() { $("hooks-dlg").showModal(); this.draw(); this.scan(true); },
+};
+$("hooks-btn").addEventListener("click", () => hooks.open());
+$("hk-close").addEventListener("click", () => $("hooks-dlg").close());
+$("hk-scan").addEventListener("click", () => hooks.scan(false));
+$("hk-all").addEventListener("click", e => installHooks({all: true}, e.currentTarget));
+$("hooks-dlg").addEventListener("click", e => { if (e.target === $("hooks-dlg")) $("hooks-dlg").close(); });
+window.cadre = {esc, short, ago, agoShort, dur, hash, famColor, nameOf, statusLabel, shade, botSVG, copSVG, agentCard, WARN, FAMILY, toast, copyText};
+
+// ---------------------------------------------------------------- theme
+const SUN = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const MOON = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>';
+const theme = () => document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+function paintTheme() {
+  const dark = theme() === "dark";
+  $("theme").innerHTML = dark ? SUN : MOON;
+  $("theme").setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+  document.querySelector('meta[name="theme-color"]').content = dark ? "#0a0e16" : "#f4f6fa";
+}
+$("theme").addEventListener("click", () => {
+  const next = theme() === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem("theme", next); } catch (e) {}
+  paintTheme();
+});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", paintTheme);
+paintTheme();
+
+function toast(msg) {
+  const t = $("toast"), host = document.querySelector("dialog[open]") || document.body;
+  if (t.parentNode !== host) host.appendChild(t);
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.remove("show"), Math.max(2600, msg.length * 55));
+}
+
+// ---------------------------------------------------------------- alerts (the snapshot's "alerts")
+// A finding that is new gets a toast here and, if switched on with the bell, a desktop
+// notification. The tray icon notifies by itself; the bell is for when there is no tray.
+const BELL = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg>';
+const BELL_OFF = BELL.replace("</svg>", '<path d="M4 4l16 16"/></svg>');
+const canNotify = "Notification" in window;
+const notifyWanted = () => { try { return localStorage.getItem("notify") === "1"; } catch (e) { return false; } };
+const notifyOn = () => canNotify && Notification.permission === "granted" && notifyWanted();
+function paintNotify() {
+  const b = $("notify"), on = notifyOn();
+  b.hidden = !canNotify;
+  b.innerHTML = on ? BELL : BELL_OFF;
+  b.setAttribute("aria-pressed", on ? "true" : "false");
+  b.title = on ? "Desktop notifications for risk flags are on. Click to turn them off."
+    : canNotify && Notification.permission === "denied" ? "This browser blocks notifications for this page. Allow them in its site settings."
+    : "Notify me on the desktop when a rule flags an agent";
+}
+$("notify").addEventListener("click", async () => {
+  let want = !notifyOn();
+  if (want && Notification.permission !== "granted") want = (await Notification.requestPermission()) === "granted";
+  try { localStorage.setItem("notify", want ? "1" : "0"); } catch (e) {}
+  paintNotify();
+  toast(want ? "Desktop notifications for risk flags are on." : Notification.permission === "denied" ? "The browser blocks notifications for this page." : "Desktop notifications are off.");
+});
+paintNotify();
+let alertMark = Date.now() / 1000;     // alerts from before this page opened aren't news
+function renderAlerts(s) {
+  const fresh = (s.alerts || []).filter(a => a.ts > alertMark);     // newest first
+  if (!fresh.length) return;
+  alertMark = Math.max(...fresh.map(a => a.ts));
+  const title = a => `${a.agent || "agent"}${a.project ? " · " + a.project : ""}`;
+  toast(`Risk flag · ${title(fresh[0])}: ${fresh[0].text}${fresh.length > 1 ? ` (+${fresh.length - 1} more)` : ""}`);
+  if (notifyOn()) for (const a of fresh.slice(0, 3)) {
+    try { new Notification("cADRe: " + title(a), {body: a.text, tag: a.id, icon: "/static/icon.svg"}); } catch (e) {}
+  }
+}
+
+// ---------------------------------------------------------------- sections
+const hotFindings = a => (a.findings || []).filter(f => f.severity !== "info");
+function renderRisk(s) {
+  const el = $("risk");
+  const sev = a => hotFindings(a).some(f => f.severity === "high") ? 2 : hotFindings(a).length ? 1 : 0;
+  // One row per running agent that needs a decision: it has a risk flag, or cADRe paused it.
+  // A paused agent stays here after its flags are gone (false positive), or nothing on the
+  // page would say it is still suspended and offer Resume. A session that has ended (or that
+  // you killed) keeps its flag on the Risk flags tile and in the Alerts tab.
+  const rows = (s.agents || []).filter(a => a.pid && (hotFindings(a).length || a.paused_by_cadre))
+    .sort((p, q) => sev(q) - sev(p));                                // high first, paused without a flag last
+  if (!rows.length) { el.hidden = true; el.dataset.html = ""; return; }
+  const MAX = 4;
+  const html = rows.slice(0, MAX).map(a => {
+    const fs = hotFindings(a), f = fs[0];
+    const who = `<div class="name ell">${esc(a.display_name || a.agent)} in ${esc(a.project || "?")}</div>`;
+    const office = `<button type="button" class="btn sm" data-office-focus="${esc(a.id)}">Show in the office</button>`;
+    if (!f) return `<div class="risk-banner paused">${botSVG(a, "head", 56, 47)}
+      <div class="who"><div class="when">Paused by cADRe</div>${who}
+        <div class="what">Suspended with its child processes until you resume it. It has no risk flag now.</div></div>
+      <div class="acts">${actBtns(a)}${office}</div></div>`;
+    return `<div class="risk-banner">${botSVG(a, "head", 56, 47)}
+      <div class="who"><div class="when">Risk flag · ${esc(f.severity)}${a.paused_by_cadre ? " · paused by cADRe" : ""}</div>${who}
+        <div class="what mono ell" title="${esc(fs.map(x => x.title + (x.detail ? ` (${x.detail})` : "")).join("\n"))}">${esc(f.title + (f.detail ? ` (${f.detail})` : ""))}${fs.length > 1 ? ` · +${fs.length - 1} more` : ""}</div></div>
+      <div class="acts">${actBtns(a)}<button type="button" class="btn sm" data-dismiss="${esc(JSON.stringify(fpOf(a, f)))}" title="Not a risk: take this flag off the agent and the alerts">False positive</button>${office}</div></div>`;
+  }).join("") + (rows.length > MAX ? `<div class="risk-more mute">+${rows.length - MAX} more: see the agent cards below.</div>` : "");
+  el.hidden = false;
+  if (el.dataset.html !== html) { el.innerHTML = html; el.dataset.html = html; }   // keep a button under the cursor alive
+}
+
+function renderKpis(s) {
+  const c = s.counts || {}, ags = s.agents || [], fl = (s.tracker && s.tracker.flagged) || [];
+  const first = st => ags.find(a => a.status === st);
+  const w = first("waiting"), idle = ags.filter(a => a.status === "idle");
+  const projects = new Set(ags.filter(a => a.status === "working").map(a => a.project || a.cwd || a.id));
+  const inUse = (s.installed || []).filter(i => i.active).length;
+  const tile = (cls, label, n, sub, hot, attrs = "") => `<div class="kpi ${cls}${hot ? " hot" : ""}"${attrs}><div class="kpi-label">${label}</div><div class="kpi-n">${n}</div><div class="kpi-sub">${sub}</div></div>`;
+  $("kpis").innerHTML =
+    tile("needs", "Needs you", c.waiting || 0, w ? esc(`${nameOf(w)} · ${w.project || "?"} · ${agoShort(w.last_activity)}`) : "nothing waiting", c.waiting) +
+    tile("working", "Working", c.working || 0, c.working ? `in ${projects.size} project${projects.size === 1 ? "" : "s"}` : "all quiet") +
+    tile("idle", "Idle", c.idle || 0, idle.length ? esc(idle.slice(0, 2).map(a => `${nameOf(a)} · ${a.project || (a.kind === "desktop" ? "app" : a.kind || "?")}`).join(", ")) : "—") +
+    tile("sleeping", "Sleeping", c.sleeping || 0, "resumable sessions") +
+    tile("installed", "Installed", c.installed || 0, `${inUse} in use`) +
+    tile("risk", "Risk flags", fl.length, fl.length ? esc(`${fl[0].name}: ${fl[0].flags[0]}`) : "nothing suspicious", fl.length,
+      ' data-open-explorer data-kind="flagged" role="button" tabindex="0" title="Show flagged events in the explorer"');
+}
+
+function renderNeeds(s) {
+  const waiting = (s.agents || []).filter(a => a.status === "waiting");
+  const el = $("needs");
+  if (!waiting.length) { el.hidden = true; return; }
+  const a = waiting[0];
+  el.hidden = false;
+  el.innerHTML = `${botSVG(a, "head", 56, 47)}
+    <div class="who"><div class="when">Waiting for you · ${esc(agoShort(a.last_activity))}${waiting.length > 1 ? ` · +${waiting.length - 1} more` : ""}</div>
+      <div class="name ell">${esc(a.display_name || a.agent)} in ${esc(a.project || "?")}</div>
+      <div class="what mono ell"><span class="copyable" data-copy="${esc(a.waiting_for || a.last_tool || "")}" title="${esc(a.waiting_for || a.last_tool || "")}">${esc(a.waiting_for || a.last_tool || "needs your input")}</span></div></div>
+    <button type="button" class="go" data-id="${esc(a.id)}">Show in the office</button>`;
+  el.querySelector(".go").onclick = () => window.officeFocus && window.officeFocus(a.id);
+}
+
+const EVENT_NAMES = {UserPromptSubmit: "Prompt", Stop: "Done", SubagentStop: "Subagent done", SessionStart: "Start",
+  SessionEnd: "End", Notification: "Waiting", PreCompact: "Compact", PermissionRequest: "Waiting"};
+const AGENT_NAME = {"claude-code": "Claude Code", codex: "Codex", copilot: "Copilot", gemini: "Gemini", cursor: "Cursor", windsurf: "Windsurf", devin: "Devin", zcode: "ZCode", ZCode: "ZCode"};
+const AGENT_FAMILY = {"claude-code": "claude", codex: "openai", gemini: "gemini", copilot: "copilot", zcode: "glm", ZCode: "glm", cursor: "cursor", windsurf: "windsurf", devin: "other"};
+const FEED_MAX = 50;                   // the side feed shows the newest 50; the explorer has the rest
+let sessions = new Map();              // session_id -> live agent record (last snapshot)
+let ITEMS = new Map();                 // row key -> item, for every event row on screen
+const evKey = e => [e.ts, e.session_id, e.event, e.tool].join("|");
+function toItem(e) {
+  const k = evKey(e);
+  if (ITEMS.has(k)) return ITEMS.get(k);
+  const a = sessions.get(e.session_id) || {};
+  const it = {e, key: k,
+    name: a.agent ? nameOf(a) : AGENT_NAME[e.agent] || e.agent || "agent",
+    fam: a.family || AGENT_FAMILY[e.agent],
+    proj: e.project || (e.cwd || "").split(/[\\/]/).filter(Boolean).pop() || "—",
+    kind: e.tool || EVENT_NAMES[e.event] || e.event || "event",
+    cls: e.failed ? "k-fail" : e.tool ? "k-tool" : /Prompt|Notification|Permission/.test(e.event) ? "k-prompt" : /Start/.test(e.event) ? "k-start" : "k-stop"};
+  ITEMS.set(k, it);
+  return it;
+}
+function pruneItems() {                // forget rows that left both lists
+  if (ITEMS.size < 4000) return;
+  const keep = new Map();
+  for (const it of feed.concat(alerts, ex.items)) keep.set(it.key, it);
+  ITEMS = keep;
+}
+const clock = ts => {
+  const d = new Date(ts * 1000), today = d.toDateString() === new Date().toDateString();
+  return (today ? "" : d.toLocaleDateString([], {month: "short", day: "numeric"}) + " ") +
+    d.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit", second: "2-digit"});
+};
+// What was already done about the agent behind an alert: the newest Pause / Resume / Kill of
+// its session, if that came after the event. Killed stays; paused only while it still is.
+function takenFor(e) {
+  const rs = (lastSnap && lastSnap.responses) || [];       // newest first
+  const r = e.session_id && rs.find(r => r.ok && r.session_id === e.session_id && (r.action === "pause" || r.action === "resume" || r.action === "kill"));
+  if (!r || r.ts < e.ts) return null;
+  const at = clock(r.ts);
+  if (r.action === "kill") return {action: "kill", text: "Killed " + at, title: `You killed this agent at ${at}: ${r.result || ""}`};
+  const a = sessions.get(e.session_id);
+  if (r.action === "pause" && a && a.paused_by_cadre) return {action: "pause", text: "Paused " + at, title: `You paused this agent at ${at}. Resume it from the banner, its card or the Responses tab.`};
+  return null;
+}
+const takenSig = s => (s.responses || []).length + "|" + (((s.responses || [])[0] || {}).ts || "") + "|" +
+  (s.agents || []).filter(a => a.paused_by_cadre).map(a => a.id).join(",");
+function rowHTML(it, wide, alert, fp) {   // alert: the Alerts tab shows why it was flagged and the real command
+  const e = it.e;
+  const fl = (e.findings || []).length;
+  if (alert && fl) {
+    const f = e.findings[0], more = fl > 1 ? ` +${fl - 1}` : "";
+    it = Object.assign({}, it, {kind: f.title + more, cls: "k-flag"});
+    const e2 = Object.assign({}, e, {detail: (f.detail || e.command || e.path || e.detail || "").replace(/\s+/g, " ")});
+    return rowHTML.call(null, Object.assign(it, {e: e2}), wide, false, true);
+  }
+  const tk = fp ? takenFor(e) : null;
+  const fpBtn = (tk ? `<span class="taken taken-${tk.action}" title="${esc(tk.title)}">${esc(tk.text)}</span>` : "") +
+    (fp ? `<button type="button" class="fp-btn" data-dismiss-ev="${esc(it.key)}" title="Not a risk: take this off the alerts and the agent's risk flags">False positive</button>` : "");
+  return `<li${fp ? ` class="has-fp${tk && tk.action === "kill" ? " is-killed" : ""}"` : ""}><button type="button" class="ev${wide ? " wide" : ""}${fl ? " flagged" : ""}" data-k="${esc(it.key)}"
+      aria-label="${esc(`${it.kind} by ${it.name} in ${it.proj}, ${clock(e.ts)}: ${e.detail || ""}. Click to copy.`)}">
+    <span class="t">${esc(wide ? clock(e.ts) : agoShort(e.ts))}</span><span class="sq" style="background:${famColor(it.fam)}"></span>
+    <span class="who ell"><b>${esc(it.name)}</b><span> · ${esc(it.proj)}</span></span>
+    <span class="what mono ell">${fl ? `<span class="rf" title="${esc(e.findings.map(f => f.title).join(", "))}">${WARN}</span>` : ""}<b class="${it.cls}">${esc(it.kind)}${e.failed ? " failed" : ""}</b>${esc(e.detail || "")}</span></button>${fpBtn}</li>`;
+}
+
+// ---------------------------------------------------------------- live feed (the newest 50; the explorer has the rest)
+// Two tabs: Activity (every event) and Alerts (events a detection rule flagged, cadre/detect).
+// Alerts keeps its own list, seeded from the log, so an alert stays after it scrolls out of Activity.
+const ALERT_WINDOW = 3600;             // the tab's count: alerts of the last hour (as detect/review.py)
+let feed = [], alerts = [], feedNew = 0, ignoreScroll = 0, alertsSeeded = false;
+let feedTab = "all";
+const TABS = ["all", "alerts", "responses"];
+try { if (TABS.includes(localStorage.getItem("feedTab"))) feedTab = localStorage.getItem("feedTab"); } catch (e) {}
+// A false positive was marked or taken back (here or in another window): the server now
+// sends other findings for the same events, so the rows held here are dropped and read again.
+let dismissSig = null, respSig = "", alertTaken = "";
+function resetFeed() {
+  ITEMS = new Map(); feed = []; alerts = []; alertsSeeded = false; feedNew = 0; respSig = "";
+  $("events").innerHTML = "";
+  if (ex.open()) ex.reset();
+}
+// ---- Responses tab: the response log (pause, resume, kill, false positives), newest first
+const RESP_LABEL = {pause: "Paused", resume: "Resumed", kill: "Killed", dismiss: "False positive", restore: "Flag restored"};
+const fpKey = d => [d.who, d.rule, d.detail || ""].join("|");
+function respRow(r, active, shown) {
+  const k = fpKey(r), undo = r.action === "dismiss" && r.ok && active.has(k) && !shown.has(k);
+  if (undo) shown.add(k);
+  const what = r.result || "", why = (r.flags || []).join("\n");
+  // the newest Pause of an agent that is still paused: undo it from here
+  const pa = r.action === "pause" && r.ok && !shown.has("p|" + r.agent_id) &&
+    ((lastSnap && lastSnap.agents) || []).find(a => a.id === r.agent_id && a.pid === r.pid && a.paused_by_cadre);
+  if (pa) shown.add("p|" + r.agent_id);
+  return `<li class="resp${r.ok ? "" : " failed"}"><span class="t" data-ts="${esc(r.ts)}" title="${esc(new Date(r.ts * 1000).toLocaleString())}">${esc(agoShort(r.ts))}</span>
+    <b class="ra ra-${esc(r.action)}">${esc(RESP_LABEL[r.action] || r.action)}${r.ok ? "" : " · failed"}</b>
+    <span class="who ell"><b>${esc(r.agent || "agent")}</b>${r.project ? `<span> · ${esc(r.project)}</span>` : ""}</span>
+    <span class="what ell" title="${esc(what + (why && r.action !== "dismiss" && r.action !== "restore" ? "\nflagged for:\n" + why : ""))}">${esc(what)}</span>
+    ${undo ? `<button type="button" class="fp-btn" data-restore="${esc(JSON.stringify({who: r.who, rule: r.rule, detail: r.detail || "", agent: r.agent || "", project: r.project || ""}))}" title="It was a risk after all: show this flag again">Undo</button>`
+      : pa ? `<button type="button" class="fp-btn" data-respond="resume" data-id="${esc(pa.id)}" title="Still paused: let this agent run again">Resume</button>` : "<span></span>"}</li>`;
+}
+function drawResponses() {
+  const rs = (lastSnap && lastSnap.responses) || [];
+  const active = new Set(((lastSnap && lastSnap.dismissed) || []).map(fpKey)), shown = new Set();
+  $("events").innerHTML = rs.length
+    ? rs.map(r => respRow(r, active, shown)).join("") + `<li class="feed-more">The newest ${rs.length} responses. The whole log: <code>python3 -m cadre --responses</code> (~/.cadre/responses.jsonl).</li>`
+    : `<li class="empty">Nothing yet. Pausing, resuming or killing an agent, and marking an alert as a false positive, are recorded here.</li>`;
+  $("feed-new").hidden = true;
+  hidePop();
+}
+function countResponses(s) {
+  const now = Date.now() / 1000, n = (s.responses || []).filter(r => r.ts >= now - ALERT_WINDOW).length;
+  $("responses-n").textContent = n ? String(n) : "";
+  $("tab-responses").title = n ? `${n} response${n === 1 ? "" : "s"} in the last hour` : "What was done about agents and alerts: pause, resume, kill, false positives";
+}
+const flagged = it => (it.e.findings || []).length > 0;
+const newestFirst = (p, q) => q.e.ts - p.e.ts;
+function addAlerts(items) {            // -> how many were new
+  const known = new Set(alerts.map(it => it.key));
+  const fresh = items.filter(it => flagged(it) && !known.has(it.key));
+  if (fresh.length) alerts = fresh.concat(alerts).sort(newestFirst).slice(0, FEED_MAX);
+  return fresh.length;
+}
+async function seedAlerts() {
+  alertsSeeded = true;
+  try {
+    const r = await (await fetch("/api/events?" + new URLSearchParams({kind: "flagged", limit: FEED_MAX}), {cache: "no-store"})).json();
+    if (addAlerts(r.events.map(toItem)) && feedTab === "alerts") drawFeed(0);
+    countAlerts();
+  } catch (e) { alertsSeeded = false; }   // try again with the next snapshot
+}
+function countAlerts() {
+  const now = Date.now() / 1000, n = alerts.filter(it => it.e.ts >= now - ALERT_WINDOW).length, el = $("alerts-n");
+  el.textContent = n ? String(n) : "";
+  el.classList.toggle("hot", n > 0);
+  $("tab-alerts").title = n ? `${n} alert${n === 1 ? "" : "s"} in the last hour` : "Events a detection rule flagged";
+}
+function renderFeed(s) {
+  sessions = new Map((s.agents || []).filter(a => a.session_id).map(a => [a.session_id, a]));
+  $("feed-meta").textContent = s.tracker ? `${s.tracker.events_received} hook events · ${s.tracker.hooked_sessions} hooked session${s.tracker.hooked_sessions === 1 ? "" : "s"}` : "";
+  const dis = s.dismissed || [], sig = dis.length + "|" + ((dis[0] || {}).ts || "");
+  if (dismissSig !== null && sig !== dismissSig) resetFeed();
+  dismissSig = sig;
+  const known = new Set(feed.map(it => it.key));
+  const fresh = (s.events || []).map(toItem).filter(it => !known.has(it.key));
+  const newAlerts = addAlerts((s.events || []).map(toItem));
+  if (!alertsSeeded) seedAlerts();
+  countAlerts();
+  countResponses(s);
+  if (fresh.length) feed = fresh.concat(feed).sort(newestFirst).slice(0, FEED_MAX);
+  if (feedTab === "responses") {
+    const now = takenSig(s) + "|" + sig;
+    if (now !== respSig) { respSig = now; drawResponses(); }
+    else for (const t of $("events").querySelectorAll(".resp .t")) t.textContent = agoShort(Number(t.dataset.ts));
+    return;
+  }
+  const added = feedTab === "alerts" ? newAlerts : fresh.length;
+  const tsig = takenSig(s), retag = feedTab === "alerts" && tsig !== alertTaken;   // a response changes the rows' tags
+  alertTaken = tsig;
+  if (added || retag || !$("events").children.length) {
+    drawFeed(added);
+    if (fresh.length && ex.open() && ex.items.length <= ex.PAGE && $("ex-scroll").scrollTop < 4) ex.reset();
+  } else {
+    for (const t of $("events").querySelectorAll(".ev .t")) {   // only the "12s" labels changed
+      const it = ITEMS.get(t.parentElement.dataset.k);
+      if (it) t.textContent = agoShort(it.e.ts);
+    }
+  }
+}
+function drawFeed(added) {
+  if (feedTab === "responses") { respSig = ""; return drawResponses(); }
+  const box = $("feed-scroll"), list = $("events"), onAlerts = feedTab === "alerts";
+  const rows = onAlerts ? alerts : feed;
+  const focused = keyboardFocus() ? document.activeElement.dataset.k : null;
+  const top = box.scrollTop, height = list.scrollHeight;
+  const foot = onAlerts
+    ? `The newest ${FEED_MAX} alerts. <button type="button" class="linkbtn" data-open-explorer data-kind="flagged">Open the explorer</button> for all of them.`
+    : `The newest ${FEED_MAX} events. <button type="button" class="linkbtn" data-open-explorer data-kind="">Open the explorer</button> for the full history.`;
+  const empty = onAlerts
+    ? "No alerts. Events a detection rule flags (risky commands, credentials, secrets, loops) show here. <code>python3 -m cadre --rules</code> lists the rules."
+    : "No hook events yet. Sessions with the cADRe hook installed stream here.";
+  list.innerHTML = rows.length ? rows.map(it => rowHTML(it, false, onAlerts)).join("") + `<li class="feed-more">${foot}</li>`
+    : `<li class="empty">${empty}</li>`;
+  if (added && top > 4) {              // reading older events: keep them where they were
+    ignoreScroll = performance.now() + 150;
+    box.scrollTop = top + (list.scrollHeight - height);
+    feedNew += added;
+  }
+  const pill = $("feed-new");
+  pill.hidden = !feedNew;
+  pill.textContent = `↑ ${feedNew} new${onAlerts ? ` alert${feedNew === 1 ? "" : "s"}` : ""}`;
+  if (focused) { const b = list.querySelector(`.ev[data-k="${CSS.escape(focused)}"]`); if (b) b.focus({preventScroll: true}); }
+  const over = document.querySelector(".ev:hover") || (keyboardFocus() ? document.activeElement : null);
+  over ? showPop(over) : hidePop();
+  pruneItems();
+}
+function setFeedTab(tab, focus, draw = true) {
+  feedTab = tab;
+  try { localStorage.setItem("feedTab", tab); } catch (e) {}
+  for (const b of document.querySelectorAll(".feed .tab")) {
+    const on = b.dataset.tab === tab;
+    b.setAttribute("aria-selected", on ? "true" : "false");
+    b.tabIndex = on ? 0 : -1;
+    if (on && focus) b.focus();
+  }
+  $("feed-scroll").setAttribute("aria-labelledby", "tab-" + tab);
+  $("feed-explorer").dataset.kind = tab === "alerts" ? "flagged" : "";   // the explorer opens on the same view
+  feedNew = 0;
+  $("feed-scroll").scrollTop = 0;
+  if (draw) drawFeed(0);
+}
+for (const b of document.querySelectorAll(".feed .tab")) b.addEventListener("click", () => setFeedTab(b.dataset.tab));
+document.querySelector(".feed .tabs").addEventListener("keydown", e => {   // arrow keys move between tabs
+  if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+  e.preventDefault();
+  setFeedTab(TABS[(TABS.indexOf(feedTab) + (e.key === "ArrowRight" ? 1 : TABS.length - 1)) % TABS.length], true);
+});
+$("feed-scroll").addEventListener("scroll", () => {
+  if ($("feed-scroll").scrollTop < 4 && feedNew) { feedNew = 0; $("feed-new").hidden = true; }
+}, {passive: true});
+$("feed-new").addEventListener("click", () => { $("feed-scroll").scrollTo({top: 0, behavior: "smooth"}); feedNew = 0; $("feed-new").hidden = true; });
+setFeedTab(feedTab, false, false);   // the first snapshot draws the list
+
+// ---------------------------------------------------------------- event explorer (dialog or its own window)
+const ex = {
+  PAGE: 100, items: [], more: true, loading: false, token: 0,
+  open: () => $("explorer").open,
+  params() {
+    const p = new URLSearchParams({limit: ex.PAGE});
+    for (const [k, id] of [["q", "ex-q"], ["agent", "ex-agent"], ["kind", "ex-kind"], ["project", "ex-project"]]) {
+      const v = $(id).value.trim(); if (v) p.set(k, v);
+    }
+    return p;
+  },
+  reset() { ex.items = []; ex.more = true; ex.loading = false; ex.token++; ex.load(); },
+  async load() {
+    if (ex.loading || !ex.more) return;
+    ex.loading = true; ex.draw();
+    const token = ex.token, p = ex.params(), oldest = ex.items[ex.items.length - 1];
+    if (oldest) p.set("before", oldest.e.ts);
+    try {
+      const r = await (await fetch("/api/events?" + p, {cache: "no-store"})).json();
+      if (token !== ex.token) return;          // the filters changed meanwhile
+      const known = new Set(ex.items.map(it => it.key));
+      ex.items = ex.items.concat(r.events.map(toItem).filter(it => !known.has(it.key)));
+      ex.more = r.more;
+    } catch (e) { if (token === ex.token) toast("Couldn't load events."); }
+    if (token === ex.token) { ex.loading = false; ex.draw(); }
+  },
+  draw() {
+    const filtered = [...ex.params().keys()].some(k => k !== "limit");
+    $("ex-count").textContent = `${ex.items.length} event${ex.items.length === 1 ? "" : "s"}${filtered ? " match" : ""}${ex.more ? " so far" : ""}`;
+    const foot = ex.loading ? "Loading…" : ex.more ? `<button type="button" class="linkbtn" id="ex-older">Load older events</button>`
+      : ex.items.length ? "That's everything in the log." : (filtered ? "No events match these filters." : "No hook events yet.");
+    $("ex-list").innerHTML = ex.items.map(it => rowHTML(it, true)).join("") + `<li class="feed-more">${foot}</li>`;
+    const over = document.querySelector("#ex-list .ev:hover");
+    over ? showPop(over) : hidePop();
+    pruneItems();
+  },
+  fillOptions() {                              // agents and projects to filter by
+    const agents = new Map(Object.entries({"claude-code": "Claude Code", codex: "Codex", copilot: "Copilot", gemini: "Gemini",
+      cursor: "Cursor", windsurf: "Windsurf", devin: "Devin", ZCode: "ZCode"}));
+    const sel = $("ex-agent"), cur = sel.value;
+    sel.innerHTML = '<option value="">All agents</option>' + [...agents].map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("");
+    sel.value = cur;
+    const ps = $("ex-project"), pcur = ps.value;
+    const names = [...new Set(((lastSnap && lastSnap.projects) || []).map(p => p.name))].sort((a, b) => a.localeCompare(b));
+    ps.innerHTML = '<option value="">All projects</option>' + names.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join("");
+    ps.value = pcur;
+  },
+  show() {
+    ex.fillOptions();
+    if (!ex.open()) $("explorer").showModal();
+    ex.reset();
+    setTimeout(() => $("ex-q").focus(), 0);
+  },
+};
+document.addEventListener("click", e => {
+  const opener = e.target.closest("[data-open-explorer]");
+  if (opener) { if (opener.dataset.kind !== undefined) $("ex-kind").value = opener.dataset.kind; ex.show(); }
+  if (e.target.id === "ex-older") ex.load();
+});
+document.addEventListener("keydown", e => {        // the Risk flags tile acts as a button
+  const t = e.target.closest && e.target.closest('[data-open-explorer][role="button"]');
+  if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); t.click(); }
+});
+$("ex-close").addEventListener("click", () => STANDALONE ? window.close() : $("explorer").close());
+$("ex-popout").addEventListener("click", () => {
+  window.open("/#explorer", "cadre-explorer", "popup,width=1180,height=860");
+  $("explorer").close();
+});
+let exTimer;
+$("ex-q").addEventListener("input", () => { clearTimeout(exTimer); exTimer = setTimeout(ex.reset, 250); });
+for (const id of ["ex-agent", "ex-kind", "ex-project"]) $(id).addEventListener("change", ex.reset);
+$("ex-scroll").addEventListener("scroll", () => {
+  const b = $("ex-scroll");
+  if (b.scrollTop + b.clientHeight > b.scrollHeight - 200) ex.load();
+}, {passive: true});
+$("explorer").addEventListener("close", hidePop);
+// /#explorer: the explorer alone, in its own window (the "Open in new window" button)
+const STANDALONE = location.hash === "#explorer";
+addEventListener("hashchange", () => { if (STANDALONE !== (location.hash === "#explorer")) location.reload(); });
+if (STANDALONE) {
+  document.body.classList.add("explorer-only");
+  document.title = "cADRe · Events";
+  $("explorer").show();
+  ex.reset();
+}
+
+// ---------------------------------------------------------------- the full event on hover or focus; a click copies it
+// keyboard focus keeps the card open; focus left behind by a mouse click doesn't
+const keyboardFocus = () => { const a = document.activeElement; return !!a && !!a.classList && a.classList.contains("ev") && a.matches(":focus-visible"); };
+function feedText(it) { return it.e.detail || it.kind; }
+function showPop(btn) {
+  const it = ITEMS.get(btn.dataset.k);
+  if (!it) return hidePop();
+  const e = it.e, text = feedText(it), cut = /…$/.test(e.detail || "");
+  const pop = $("pop"), host = btn.closest("dialog") || document.body;
+  if (pop.parentNode !== host) host.appendChild(pop);        // a modal dialog sits above everything else
+  pop.innerHTML = `<div class="pop-head"><span class="sq" style="background:${famColor(it.fam)}"></span><b>${esc(it.name)}</b>
+      <span>· ${esc(it.proj)} · ${esc(clock(e.ts))} (${esc(ago(e.ts))})</span></div>
+    <div class="pop-kind ${it.cls}">${esc(it.kind)}${e.failed ? " · failed" : ""}${e.tool && e.event ? ` <span class="mute">· ${esc(e.event)}</span>` : ""}</div>
+    <div class="pop-text mono">${esc(text)}</div>
+    ${e.command && e.command !== text ? `<div class="pop-text mono">$ ${esc(e.command)}</div>` : ""}
+    ${(e.findings || []).length ? `<div class="pop-finds">${e.findings.map(f => `<div class="pop-find">${WARN} <b>${esc(f.title)}</b>${f.detail ? ": " + esc(f.detail) : ""} <span class="mute">· ${esc(f.severity)} · rule ${esc(f.rule)}</span></div>`).join("")}</div>` : ""}
+    ${(e.dismissed || []).length ? `<div class="pop-finds">${e.dismissed.map(f => `<div class="pop-find gone"><b>${esc(f.title)}</b>${f.detail ? ": " + esc(f.detail) : ""} <span class="mute">· marked as a false positive</span></div>`).join("")}</div>` : ""}
+    ${e.cwd ? `<div class="pop-foot mono">${esc(e.cwd)}</div>` : ""}
+    <div class="pop-foot">Click to copy${cut ? " · the hook keeps only the start of long text (cADRe never stores full prompts or outputs)" : ""}</div>`;
+  pop.hidden = false;
+  const r = btn.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
+  const left = Math.max(12, Math.min(r.left + (btn.classList.contains("wide") ? 380 : 230), innerWidth - pw - 12));
+  const top = r.bottom + 6 + ph < innerHeight - 8 ? r.bottom + 6 : Math.max(8, r.top - ph - 6);
+  pop.style.left = left + "px"; pop.style.top = top + "px";
+}
+function hidePop() { $("pop").hidden = true; }
+document.addEventListener("mouseover", e => {
+  const b = e.target.closest && e.target.closest(".ev");
+  if (b) showPop(b); else if (!keyboardFocus()) hidePop();
+});
+document.addEventListener("focusin", e => { const b = e.target.closest && e.target.closest(".ev"); if (b && b.matches(":focus-visible")) showPop(b); });
+document.addEventListener("focusout", e => { if (!(e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(".ev"))) hidePop(); });
+document.addEventListener("click", e => {
+  const b = e.target.closest(".ev"), it = b && ITEMS.get(b.dataset.k);
+  if (it) copyText(feedText(it), it.e.tool ? it.kind : it.kind.toLowerCase());
+});
+document.addEventListener("scroll", () => { if (performance.now() > ignoreScroll) hidePop(); }, {passive: true, capture: true});
+document.addEventListener("keydown", e => { if (e.key === "Escape") hidePop(); });
+
+// radar: busier = closer to the centre; labels are nudged around the ring until they don't overlap
+const RING = {working: [26, 60], waiting: [86, 122], idle: [86, 122], suspended: [86, 122], sleeping: [142, 182]};
+const PRIORITY = {waiting: 0, working: 1, suspended: 2, idle: 3, sleeping: 4};
+function renderRadar(s) {
+  const flagged = new Set(((s.tracker && s.tracker.flagged) || []).map(f => f.id));
+  const ags = (s.agents || []).filter(a => RING[a.status]);
+  const sleepers = ags.filter(a => a.status === "sleeping").slice(0, 24);
+  const list = ags.filter(a => a.status !== "sleeping").concat(sleepers)
+    .sort((p, q) => (PRIORITY[p.status] - PRIORITY[q.status]) || (flagged.has(q.id) - flagged.has(p.id)));
+  let sleepLabels = 0;
+  const items = list.map(a => {
+    const [r0, r1] = RING[a.status], h = hash(a.id);
+    const color = flagged.has(a.id) ? "var(--flag)" : `var(--${a.status})`;
+    const labelled = a.status !== "sleeping" || sleepLabels++ < 5;
+    return {a, r: r0 + (h % 1000) / 1000 * (r1 - r0), ang: (h % 360) * Math.PI / 180, color, labelled,
+            ping: a.status === "working" || a.status === "waiting" || flagged.has(a.id)};
+  });
+  const box = $("blips");
+  box.innerHTML = items.map((b, i) => `<div class="blip${b.ping ? " ping" : ""}${b.a.status === "sleeping" ? " small" : ""}" data-i="${i}" data-id="${esc(b.a.id)}" title="${esc(nameOf(b.a) + " · " + (b.a.project || b.a.status))}">
+      <span class="dot" style="--c:${b.color}"></span>${b.labelled ? `<span class="blip-label"><b>${esc(short(nameOf(b.a), 16))}</b><span> · ${esc(short(b.a.project || b.a.status, 18))}</span></span>` : ""}</div>`).join("");
+  const R = $("radar").getBoundingClientRect(), placed = [];
+  const overlaps = r => placed.some(p => r.left < p.right + 3 && r.right > p.left - 3 && r.top < p.bottom + 2 && r.bottom > p.top - 2);
+  box.querySelectorAll(".blip").forEach(el => {
+    const b = items[+el.dataset.i], label = el.querySelector(".blip-label");
+    const put = ang => {
+      const x = 50 + b.r * Math.cos(ang) / 4, y = 50 + b.r * Math.sin(ang) / 4;
+      el.style.left = x + "%"; el.style.top = y + "%";
+      el.classList.toggle("left", x > 56);
+    };
+    let ok = false;
+    for (const k of [0, 1, -1, 2, -2, 3, -3, 4, -4, 6, -6]) {
+      put(b.ang + k * 0.28);
+      const r = (label || el).getBoundingClientRect(), d = el.querySelector(".dot").getBoundingClientRect();
+      const inside = r.left >= R.left - 20 && r.right <= R.right + 20;
+      if (inside && !overlaps(r) && !overlaps(d)) { ok = true; placed.push(r, d); break; }
+    }
+    if (!ok) { put(b.ang); if (label) label.remove(); placed.push(el.querySelector(".dot").getBoundingClientRect()); }
+  });
+}
+
+function renderTables(s) {
+  $("projects").innerHTML = "<tr><th>Project</th><th>Path</th><th>Agents</th><th>Sessions</th><th>Branch</th><th>Last activity</th></tr>" +
+    (s.projects || []).map(p => `<tr><td><b>${esc(p.name)}</b></td><td class="path">${esc(p.path)}</td><td>${esc(p.agents.join(", "))}</td><td>${p.sessions ?? "—"}</td><td>${esc(p.git_branch || "—")}</td><td>${ago(p.last_activity)}</td></tr>`).join("");
+  $("installed").innerHTML = "<tr><th>Agent</th><th>Type</th><th>State</th><th>Hooks</th><th>Evidence</th></tr>" +
+    (s.installed || []).map(i => `<tr><td><span class="sq" style="background:${famColor(i.family)}"></span> <b>${esc(i.agent)}</b></td><td>${esc(i.kind)}</td><td>${i.active ? "in use" : "installed"}</td>
+      <td>${i.hooks ? hookPill(i.hooks) + (i.hooks.paths && i.hooks.paths.length ? " " + hookBtn(i.hooks.paths, "Install") : "") : "—"}</td>
+      <td class="path">${i.evidence.map(esc).join("<br>")}</td></tr>`).join("");
+}
+
+let lastSnap = null;
+function render(s) {
+  lastSnap = s;
+  $("host").lastElementChild.textContent = s.host;
+  const lim = (s.tracker && s.tracker.limited) || "";       // the process backend can't see everything
+  $("limited").hidden = !lim;
+  $("limited").title = lim;
+  const paused = !!(s.tracker && s.tracker.paused);
+  const live = $("live");
+  live.className = "live" + (paused ? " paused" : "");
+  live.lastElementChild.textContent = (paused ? "Recording paused · " : "Live · ") + "updated " + new Date(s.generated_at * 1000).toLocaleTimeString();
+  const pb = $("pause");
+  pb.hidden = false;
+  pb.innerHTML = paused
+    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 5l12 7-12 7z"/></svg>Resume recording'
+    : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>Pause recording';
+  pb.dataset.paused = paused ? "1" : "";
+  const hb = $("hooks-btn"), pend = s.hooks ? s.hooks.pending : 0;
+  hb.hidden = !s.hooks;
+  hb.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>Hooks' +
+    (pend ? `<span class="count" aria-label="${pend} pending">${pend}</span>` : "");
+  hb.title = pend ? `${pend} agent config file${pend === 1 ? "" : "s"} without the cADRe hook` : "Every hook-capable agent is hooked";
+  if ($("hooks-dlg").open && !hooks.data) hooks.draw();
+  renderKpis(s); renderRisk(s); renderNeeds(s); renderFeed(s); renderRadar(s); renderTables(s); renderAlerts(s);
+  if (STANDALONE && !ex.filled) { ex.fillOptions(); ex.filled = true; }
+  if (window.officeUpdate) window.officeUpdate(s);
+}
+
+$("pause").addEventListener("click", async () => {
+  const want = !$("pause").dataset.paused;
+  try {
+    const r = await fetch("/api/pause", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({paused: want})});
+    if (!r.ok) throw new Error(r.status);
+    toast(want ? "Paused: hooks skip their events until you resume." : "Recording hook events again.");
+  } catch (e) { toast("Couldn't change recording: " + e.message); }
+  tick();
+});
+
+async function tick() {
+  try {
+    const r = await fetch("/api/snapshot", {cache: "no-store"});
+    render(await r.json());
+  } catch (e) {
+    $("live").className = "live off";
+    $("live").lastElementChild.textContent = "dashboard offline · retrying";
+  }
+}
+let resizeTimer;
+window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => lastSnap && renderRadar(lastSnap), 150); });
+tick(); setInterval(tick, 3000);
+</script>
+<script src="/static/office.js"></script>
+</body>
+</html>
